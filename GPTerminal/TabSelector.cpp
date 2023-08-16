@@ -36,10 +36,10 @@ int TabSelector::getInput() {
 	if (!c || c == 224) { // check if they're extended char
 
 		switch (key = _getch()) {
-		case 77:
+		case 77: // arrow left
 			this->selectedOption = (this->selectedOption + 1) % 4;
 			break;
-		case 75:
+		case 75: // arrow right
 			this->selectedOption = (this->selectedOption -1) % 4;
 			if (this->selectedOption < 0) { this->selectedOption = 4; }
 			break;
@@ -48,9 +48,6 @@ int TabSelector::getInput() {
 	}
 	else {
 		switch (c) {
-		case 'q': // q
-			return 0; // (quit)
-			break;
 		case '\t':
 			this->selectedOption = (this->selectedOption + 1) % 4;
 			break;
