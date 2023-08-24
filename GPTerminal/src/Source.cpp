@@ -7,8 +7,6 @@
 
 int main(){
 
-
-
     // Select followup actions
     std::vector<std::string> options = {
         "Run",
