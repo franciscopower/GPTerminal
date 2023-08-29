@@ -1,14 +1,9 @@
 #pragma once
+#include <string>
+
 class Component
 {
-protected:
-	struct Dimention
-	{
-		int xDim = 0;
-		int yDim = 0;
-	};
-
 public:
-	virtual Dimention getDim() = 0;
+	virtual std::string draw() = 0;
 };
 

@@ -7,7 +7,7 @@ TabSelector::TabSelector(std::vector<std::string> options) {
 
 std::string TabSelector::draw() {
 	std::string output = "";
-	output.append("\x1b[1A"); // move cursor up
+
 	output.append("\r"); // carriage return
 	output.append("\x1b[2K"); //clear line
 
@@ -25,6 +25,7 @@ std::string TabSelector::draw() {
 			output.append("\t");
 		}
 	}
+
 
 	return output;
 }
@@ -58,11 +59,4 @@ int TabSelector::getInput() {
 
 	//return this->selectedOption;
 	return -1; // if an option has not been selected yet
-}
-
-TabSelector::Dimention TabSelector::getDim() {
-
-	Dimention size = { 2,3 };
-
-	return size;
 }

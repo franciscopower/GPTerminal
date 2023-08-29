@@ -24,12 +24,21 @@
     <ClCompile Include="src\TabSelector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Frame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\TabSelector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Frame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PowerTUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

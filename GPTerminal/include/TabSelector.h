@@ -13,6 +13,5 @@ public:
 	TabSelector(std::vector<std::string> options);
 	std::string draw();
 	int getInput();
-	Dimention getDim();
 };
 
