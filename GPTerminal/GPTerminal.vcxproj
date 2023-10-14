@@ -21,12 +21,16 @@
   <ItemGroup>
     <ClCompile Include="src\Frame.cpp" />
     <ClCompile Include="src\Component.cpp" />
+    <ClCompile Include="src\OpenAIService.cpp" />
     <ClCompile Include="src\Source.cpp" />
     <ClCompile Include="src\TabSelector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Frame.h" />
     <ClInclude Include="include\Component.h" />
+    <ClInclude Include="include\Loader.h" />
+    <ClInclude Include="include\OpenAIInterface.h" />
+    <ClInclude Include="include\OpenAIService.h" />
     <ClInclude Include="include\PowerTUI.h" />
     <ClInclude Include="include\TabSelector.h" />
   </ItemGroup>
