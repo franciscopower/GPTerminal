@@ -13,7 +13,8 @@ public:
 		DOTS,
 		TOGGLE,
 		ARC,
-		BALL
+		BALL,
+		BAR
 	};
 
 	Loader(Style style, std::string text) {
@@ -33,6 +34,9 @@ public:
 			break;
 		case Loader::BALL:
 			copy(begin(this->frames_ball), end(this->frames_ball), back_inserter(this->frames));
+			break;
+		case Loader::BAR:
+			copy(begin(this->frames_bar), end(this->frames_bar), back_inserter(this->frames));
 			break;
 		default:
 			break;
@@ -122,16 +126,33 @@ private:
 	//};
 
 	const std::string frames_ball[10] = {
-		"( -    )",
-		"(  -   )",
-		"(   -  )",
-		"(    - )",
-		"(     -)",
-		"(    - )",
-		"(   -  )",
-		"(  -   )",
-		"( -    )",
-		"(-     )"
+		"| 0    |",
+		"|  0   |",
+		"|   0  |",
+		"|    0 |",
+		"|     0|",
+		"|    0 |",
+		"|   0  |",
+		"|  0   |",
+		"| 0    |",
+		"|0     |"
+	};
+
+	const std::string frames_bar[4] = {
+		"|",
+		"/",
+		"-",
+		"\\",
 	};
 
 };
+
+//---------------------------------------------
+//void exampleUse{
+//
+//	Loader loader(Loader::BALL, "Loading...");
+//
+//	while (RESULT == false) {
+//		std::cout << loader.draw();
+//	}
+//}

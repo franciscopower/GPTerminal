@@ -83,16 +83,28 @@ std::string Frame::draw() {
 }
 
 std::vector<std::string> Frame::split(std::string s, std::string delimiter) {
-        size_t pos_start = 0, pos_end, delim_len = delimiter.length();
-        std::string token;
-        std::vector<std::string> res;
+	size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+	std::string token;
+	std::vector<std::string> res;
 
-        while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
-            token = s.substr(pos_start, pos_end - pos_start);
-            pos_start = pos_end + delim_len;
-            res.push_back(token);
-        }
+	while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
+		token = s.substr(pos_start, pos_end - pos_start);
+		pos_start = pos_end + delim_len;
+		res.push_back(token);
+	}
 
-        res.push_back(s.substr(pos_start));
-        return res;
-    }
+	res.push_back(s.substr(pos_start));
+	return res;
+}
+
+
+//--------------------------
+
+//void exampleUse() {
+//
+//	Frame outputFrame(std::string("this is a test string"));
+//	std::cout << outputFrame.draw() << std::endl;
+//
+//
+//	outputFrame.setContent("Lorem Ipsum is simply dummy text of the printing and typesetting industry.\nLorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.");
+//	std::cout << outputFrame.draw() << std::endl;

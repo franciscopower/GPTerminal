@@ -60,3 +60,24 @@ int TabSelector::getInput() {
 	//return this->selectedOption;
 	return -1; // if an option has not been selected yet
 }
+
+//void exampleUse() {
+//
+//  // Select followup actions
+//  std::vector<std::string> options = {
+//      "Run",
+//      "Explain",
+//      "Improve",
+//      "Quit"
+//  };
+//  TabSelector tabSelector(options);
+//
+//  // wait option selection
+//  int selectedOption = -1;
+//  while (selectedOption < 0 ) {
+//      std::cout << tabSelector.draw();
+//      selectedOption = tabSelector.getInput();
+//  }
+//  std::cout << std::endl;
+//
+//}
