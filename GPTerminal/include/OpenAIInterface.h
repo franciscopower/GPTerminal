@@ -39,11 +39,10 @@ private:
 	{
 		std::vector<Message> messages;
 		std::string model = "gpt-3.5-turbo";
-		float frequency_penalty = 0;
-		int max_tokens = 500;
+		int max_tokens;
 		int n = 1; //nr of choices to generate
+		float frequency_penalty = 0;
 		float temperature = 0.2;
-		std::string user;
 	} request;
 
 public:

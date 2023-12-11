@@ -5,47 +5,21 @@
 #include <chrono>
 
 #include "PowerTUI.h"
-
-
-class ThreadsClass
-{
-public:
-	ThreadsClass() {};
-	~ThreadsClass() {};
-
-	void setVar(bool classBool) {
-		this->runLoop = classBool;
-	}
-
-	void classLoop() {
-		int n = 0;
-		while (runLoop) {
-			n++;
-			std::cout << n << " ";
-			std::this_thread::sleep_for(std::chrono::seconds(1));
-		}
-	}
-
-private:
-
-	bool runLoop = true;
-
-};
-
+#include "OpenAIService.h"
 
 
 int main(){
 
-	ThreadsClass myThreadsClass = ThreadsClass();
+    std::string prompt;
+    std::cout << "Enter a prompt: ";
+    std::cin >> prompt;
+    std::cout << std::endl;
 
-	std::thread firstThread(&ThreadsClass::classLoop, &myThreadsClass);
+    OpenAIService aiService = OpenAIService();
 
+    std::string completion = aiService.createCompletion(prompt);
 
-	std::this_thread::sleep_for(std::chrono::seconds(5));
-
-	myThreadsClass.setVar(false);
-
-	firstThread.join();
+    std::cout << "Completion: " << completion << std::endl;
 
     return 0;
 }
