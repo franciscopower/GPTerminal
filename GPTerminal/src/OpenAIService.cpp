@@ -4,6 +4,9 @@
 #include "OpenAIService.h"
 #include "OpenAIInterface.h"
 
+#include "json.hpp"
+
+
 OpenAIService::OpenAIService()
 {
     // CURL initialization
@@ -44,6 +47,7 @@ OpenAIService::OpenAIService()
     curl_easy_setopt(this->curl, CURLOPT_DEFAULT_PROTOCOL, "https");
     curl_easy_setopt(this->curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(this->curl, CURLOPT_WRITEFUNCTION, &OpenAIService::decodeCompletion);
+    curl_easy_setopt(this->curl, CURLOPT_WRITEDATA, (void *)&(this->api_reply));
 
 }
 
@@ -60,13 +64,11 @@ std::string OpenAIService::createCompletion(std::string prompt) {
         std::cout << "[ERROR] - " << curl_easy_strerror(this->res) << std::endl;
     }
 
-    return std::string("No reply yet");
+    return this->api_reply;
 }
 
-size_t OpenAIService::decodeCompletion(char* ptr, size_t size, size_t nmemb, void* userdata) {
-    size_t bytes = size * nmemb;
-
-    std::cout << "New chunk: " << unsigned long(bytes) << std::endl;
+size_t OpenAIService::decodeCompletion(char* data, size_t size, size_t nmemb, void* userdata) {
+    ((std::string*)userdata)->append(std::string(data));
 
     return size * nmemb;
 }
