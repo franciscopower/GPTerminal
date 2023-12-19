@@ -2,8 +2,6 @@
 #include <iostream>
 
 #include "OpenAIService.h"
-#include "OpenAIInterface.h"
-
 #include "json.hpp"
 
 
@@ -53,6 +51,9 @@ OpenAIService::OpenAIService()
 
 std::string OpenAIService::createCompletion(std::string prompt) {
 
+    if (!createOpenAiRequest(prompt))
+        return "[ERROR] - Could not create request";
+
     const std::string data_from_json = ((this->openAiRequest).dump());
     const char* data = data_from_json.c_str();
     std::cout << "Request: " << data << std::endl;
@@ -66,9 +67,38 @@ std::string OpenAIService::createCompletion(std::string prompt) {
         std::cout << "[ERROR] - " << curl_easy_strerror(this->res) << std::endl;
     }
 
-    this->openAiResponse = json::parse(this->api_reply);
+    std::string reply;
 
-    return std::string(json::parse(this->api_reply)["choices"][0]["message"]["content"]);
+    try
+    {
+        this->openAiResponse = json::parse(this->api_reply);
+        reply = std::string(json::parse(this->api_reply)["choices"][0]["message"]["content"]); 
+    }
+    catch (const std::exception&)
+    {
+        std::cout << R"(
+[ERROR] - Could not parse the reply. 
+The replay might contain special characters. 
+Try repeating your request and asking the model not to return any special characters.
+)" << std::endl;
+    }
+
+    return reply;
+}
+
+bool OpenAIService::createOpenAiRequest(std::string prompt) {
+
+    this->chat.push_back({ "user", prompt });
+    
+    this->openAiRequest["model"] = this->model;
+
+    json json_messages = json::array();
+    for (ChatEntry c : this->chat) {
+        json_messages.push_back({ {"role", c.role}, {"content", c.content} });
+    }
+    this->openAiRequest["messages"] = json_messages;
+    
+    return true;
 }
 
 size_t OpenAIService::decodeCompletion(char* data, size_t size, size_t nmemb, void* userdata) {

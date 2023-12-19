@@ -10,14 +10,17 @@
 
 int main(){
 
-    std::string prompt;
     std::cout << "Enter a prompt: ";
-    std::cin >> prompt;
+    char prompt_c[1000];
+    std::cin.getline(prompt_c, 1000);
+    
     std::cout << std::endl;
+    std::string prompt = prompt_c;
+    std::cout << "Your prompt:" << prompt << std::endl;
 
     OpenAIService aiService = OpenAIService();
 
-    std::string completion = aiService.createCompletion(prompt);
+    std::string completion = aiService.createCompletion(prompt_c);
 
     std::cout << "Completion: " << completion << std::endl;
 

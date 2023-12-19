@@ -47,9 +47,6 @@
     <ClInclude Include="include\OpenAIService.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\OpenAIInterface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
