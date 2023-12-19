@@ -27,7 +27,10 @@
     <ClCompile Include="src\Frame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\OpenAIService.cpp">
+    <ClCompile Include="src\AiCompletionService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpenAiApi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -44,13 +47,19 @@
     <ClInclude Include="include\PowerTUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\OpenAIService.h">
+    <ClInclude Include="include\AiCompletionService.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="dependencies\json.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ChatApi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpenAiApi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
