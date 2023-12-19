@@ -53,8 +53,10 @@ OpenAIService::OpenAIService()
 
 std::string OpenAIService::createCompletion(std::string prompt) {
 
-    // set data for call
-    const char* data = "{\n    \"model\": \"gpt-3.5-turbo\",\n    \"messages\": [\n        {\n            \"role\": \"user\",\n            \"content\": \"Who won the world series in 2020?\"\n        },\n        {\n            \"role\": \"assistant\",\n            \"content\": \"The Los Angeles Dodgers won the World Series in 2020.\"\n        },\n        {\n            \"role\": \"user\",\n            \"content\": \"Where was it played?\"\n        }\n    ],\n    \"temperature\": 1,\n    \"top_p\": 1,\n    \"n\": 1,\n    \"stream\": false,\n    \"max_tokens\": 250,\n    \"presence_penalty\": 0,\n    \"frequency_penalty\": 0\n}";
+    const std::string data_from_json = ((this->openAiRequest).dump());
+    const char* data = data_from_json.c_str();
+    std::cout << "Request: " << data << std::endl;
+
     curl_easy_setopt(this->curl, CURLOPT_POSTFIELDS, data);
 
     // perform request
@@ -64,7 +66,9 @@ std::string OpenAIService::createCompletion(std::string prompt) {
         std::cout << "[ERROR] - " << curl_easy_strerror(this->res) << std::endl;
     }
 
-    return this->api_reply;
+    this->openAiResponse = json::parse(this->api_reply);
+
+    return std::string(json::parse(this->api_reply)["choices"][0]["message"]["content"]);
 }
 
 size_t OpenAIService::decodeCompletion(char* data, size_t size, size_t nmemb, void* userdata) {
