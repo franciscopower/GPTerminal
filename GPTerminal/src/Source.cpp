@@ -10,19 +10,26 @@
 
 int main(){
 
-    std::cout << "Enter a prompt: ";
+    OpenAIService aiService = OpenAIService();
+
+    while (true) {
+
+    std::cout << "Message: ";
     char prompt_c[1000];
     std::cin.getline(prompt_c, 1000);
-    
     std::cout << std::endl;
     std::string prompt = prompt_c;
-    std::cout << "Your prompt:" << prompt << std::endl;
 
-    OpenAIService aiService = OpenAIService();
+    if (prompt == "q" || prompt == "quit")
+        break;
 
     std::string completion = aiService.createCompletion(prompt_c);
 
-    std::cout << "Completion: " << completion << std::endl;
+    std::cout << "Reply: " << completion << std::endl;
+
+    
+
+    }
 
     return 0;
 }

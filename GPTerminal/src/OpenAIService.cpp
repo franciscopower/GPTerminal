@@ -50,14 +50,13 @@ OpenAIService::OpenAIService()
 }
 
 std::string OpenAIService::createCompletion(std::string prompt) {
+    this->api_reply = "";
 
     if (!createOpenAiRequest(prompt))
         return "[ERROR] - Could not create request";
 
     const std::string data_from_json = ((this->openAiRequest).dump());
     const char* data = data_from_json.c_str();
-    std::cout << "Request: " << data << std::endl;
-
     curl_easy_setopt(this->curl, CURLOPT_POSTFIELDS, data);
 
     // perform request
@@ -68,11 +67,14 @@ std::string OpenAIService::createCompletion(std::string prompt) {
     }
 
     std::string reply;
+    std::string role;
 
+    this->openAiResponse.clear();
     try
     {
         this->openAiResponse = json::parse(this->api_reply);
         reply = std::string(json::parse(this->api_reply)["choices"][0]["message"]["content"]); 
+        role = std::string(json::parse(this->api_reply)["choices"][0]["message"]["role"]); 
     }
     catch (const std::exception&)
     {
@@ -80,8 +82,11 @@ std::string OpenAIService::createCompletion(std::string prompt) {
 [ERROR] - Could not parse the reply. 
 The replay might contain special characters. 
 Try repeating your request and asking the model not to return any special characters.
-)" << std::endl;
+)";
+        return "";
     }
+
+    this->chat.push_back({ role, reply });
 
     return reply;
 }
@@ -90,13 +95,20 @@ bool OpenAIService::createOpenAiRequest(std::string prompt) {
 
     this->chat.push_back({ "user", prompt });
     
-    this->openAiRequest["model"] = this->model;
+    try
+    {
+		this->openAiRequest["model"] = this->model;
 
-    json json_messages = json::array();
-    for (ChatEntry c : this->chat) {
-        json_messages.push_back({ {"role", c.role}, {"content", c.content} });
+		json json_messages = json::array();
+		for (ChatEntry c : this->chat) {
+			json_messages.push_back({ {"role", c.role}, {"content", c.content} });
+		}
+		this->openAiRequest["messages"] = json_messages;
     }
-    this->openAiRequest["messages"] = json_messages;
+    catch (const std::exception&)
+    {
+        return false;
+    }
     
     return true;
 }
