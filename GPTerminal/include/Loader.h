@@ -155,4 +155,5 @@ private:
 //	while (RESULT == false) {
 //		std::cout << loader.draw();
 //	}
+//	std::cout << "\r\x1b[2K"; //carriage return and clear line
 //}

@@ -6,6 +6,7 @@
 #define URL_MAX_SIZE 100
 #define BEARER_TOKEN_MAX_SIZE 300
 
+// QUESTION: How can I use this struct definition instead of the bottom one? Which one is better?
 //struct ServiceHeaders {
 //	const char* url;
 //	const char* bearer_token;
@@ -41,6 +42,7 @@ public:
 
 };
 
+// QUESTION: Why does this not work????
 //ChatApi::ChatApi(char* model)
 //{
 //	this->model = model;

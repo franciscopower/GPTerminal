@@ -3,6 +3,7 @@
 #include <vector>
 #include <thread>
 #include <chrono>
+#include <future>
 
 #include "PowerTUI.h"
 #include "AiCompletionService.h"
@@ -14,6 +15,7 @@ int main(){
 
     AiCompletionService aiService = AiCompletionService(model);
 
+
     while (true) {
 
 		std::cout << "Message: ";
@@ -24,7 +26,19 @@ int main(){
 		if (prompt == "q" || prompt == "quit")
 			break;
 
-		std::string completion = aiService.createCompletion(prompt_c);
+		std::string completion;
+		std::thread completion_thread([&](){
+			completion = aiService.createCompletion(prompt_c);
+		});
+
+		// loader animation
+		Loader loader(Loader::BAR, "Generating...");
+		while (completion == "") {
+			std::cout << loader.draw();
+		}
+		std::cout << "\r\x1b[2K"; //carriage return and clear line
+
+		completion_thread.join();
 
 		std::cout << "Reply: " << completion << std::endl << std::endl;    
 
