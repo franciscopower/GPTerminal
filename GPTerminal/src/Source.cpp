@@ -2,14 +2,12 @@
 #include <windows.h>
 #include <vector>
 #include <thread>
-#include <chrono>
-#include <future>
 
 #include "PowerTUI.h"
 #include "AiCompletionService.h"
 
 
-int main(){
+int main(int argc, char **argv) {
 
     char model[] = "gpt-3.5-turbo";
 
@@ -40,8 +38,14 @@ int main(){
 
 		completion_thread.join();
 
-		std::cout << "Reply: " << completion << std::endl << std::endl;    
+		//Frame outputFrame("GPT");
+		//outputFrame.setContent(completion);
 
+		HLine hlinetitle("GPT");
+		HLine hline("");
+		std::cout << hlinetitle.draw() << std::endl;
+		std::cout << completion << std::endl;
+		std::cout << hline.draw() << std::endl << std::endl;
     }
 
     return 0;

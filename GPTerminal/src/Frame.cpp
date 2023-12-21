@@ -5,6 +5,9 @@
 Frame::Frame(std::string title) {
 	this->title = title;
 }
+Frame::Frame() {
+	this->title = "";
+}
 
 void Frame::setContent(std::string content) {
 	this->content = content;
@@ -20,12 +23,17 @@ std::string Frame::draw() {
 	winColumns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
 	winRows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
 
-	//draw start line
 	output.append(ulcorner);
-	output.append(" ");
-	output.append(title);
-	output.append(" ");
-	for (int i = 0; i < winColumns-2-title.length()-2; i++) {
+	int restOfLineLenght = winColumns - 2; 
+	// add title
+	if (this->title != "") {
+		output.append(" ");
+		output.append(this->title);
+		output.append(" ");
+		restOfLineLenght = restOfLineLenght - 2 - this->title.length();
+	}
+	//draw start line
+	for (int i = 0; i < restOfLineLenght; i++) {
 		output.append(hline);
 	}
 	output.append(urcorner);
@@ -40,33 +48,36 @@ std::string Frame::draw() {
 		contentWords = split(l, " ");
 
 		lineLengh = 0;
-		output.append(vline);
+		output.append(vline); // vertical line at start of line
 		for (std::string w : contentWords) {
 			lineLengh += w.length();
 
+			// if word exceeds line lenght, fill the rest of the line with 
+			// blank space and place the word in a new line
 			if (lineLengh > winColumns - 4) {
-				while (lineLengh-w.length() < winColumns - 2) {
+				while (lineLengh-w.length() < winColumns - 2) { 
 					output.append(" ");
 					lineLengh++;
 				}
-				output.append(vline);
+				output.append(vline); 
 				output.append("\n");
 				output.append(vline);
-				output.append(" ");
+				output.append(" "); // blank space at the beginning
 				lineLengh = w.length() + 1;
 			}
 			else {
-				output.append(" ");
+				output.append(" "); //blank space between words and at the beginning
 				lineLengh++;
 			}
-			output.append(w);
+			output.append(w); //append word
 		}
+		// fill in rest of line with blank space
 		while (lineLengh < winColumns-2) {
 			output.append(" ");
 			lineLengh++;
 		}
 
-		output.append(vline);
+		output.append(vline); // vertical line at the end of line
 		output.append("\n");
 	}
 

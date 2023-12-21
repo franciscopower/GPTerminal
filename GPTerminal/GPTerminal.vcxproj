@@ -31,6 +31,7 @@
     <ClInclude Include="include\ChatApi.h" />
     <ClInclude Include="include\Frame.h" />
     <ClInclude Include="include\Component.h" />
+    <ClInclude Include="include\HLine.h" />
     <ClInclude Include="include\Loader.h" />
     <ClInclude Include="include\AiCompletionService.h" />
     <ClInclude Include="include\OpenAiApi.h" />

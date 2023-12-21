@@ -11,6 +11,7 @@ class Frame : Component
 public:
 
 	Frame(std::string content);
+	Frame();
 
 	void setContent(std::string content);
 
