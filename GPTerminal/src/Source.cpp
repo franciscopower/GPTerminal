@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <vector>
 #include <thread>
+#include <filesystem>
 
 #include "PowerTUI.h"
 #include "AiCompletionService.h"
@@ -13,7 +14,8 @@ void copyToClipboard(std::string textToCopy);
 int main(int argc, char** argv) {
     char model[] = "gpt-3.5-turbo";
 
-	if ((argc == 2 && argv[1] == "chat") || argc == 1) {
+	if ((argc == 2 && strcmp(argv[1],"chat") == 0) || argc < 2) {
+		std::cout << "Let's chat! When you want to quit, just type 'quit'." << std::endl;
 		chat(model);
 	} 
 	else {
@@ -34,43 +36,56 @@ void powershellHelp(std::string prompt, char* model) {
 	bool responseComplete = false;
 
 	// set TUI
+	enum options_enum {
+		COPY,
+		EXPLAIN,
+		IMPROVE,
+		//RUN,
+		QUIT
+	};
 	std::vector<std::string> options = {
-		"Run",
+		"Copy to Clipboard",
 		"Explain",
 		"Improve",
-		"Copy to Clipboard",
+		//"Run",
 		"Quit"
 	};
 	TabSelector tabSelector(options);
 	Frame outputFrame("GPT");
 	Loader loader(Loader::BAR, "Generating...");
 
-	std::string fullPrompt = "Given the following request, create a Windows Powershell command that can solve it (your reply must only contain the command, nothing else): ";
+	std::string fullPrompt = "Keeping in mind that the current working directory is '";
+	fullPrompt.append(std::filesystem::current_path().string());
+	fullPrompt.append("', given the following request, create a Windows Powershell command that can solve it (your reply must only contain the command, nothing else): ");
 	fullPrompt.append(prompt);
+
+	std::string generatedCommand = "";
+	int selectedOption = -1;
 
 	// main loop
 	while (!responseComplete) {
 
 		// create completion
 		std::string completion;
-		//std::thread completion_thread([&](){
-		//	completion = aiService.createCompletion(fullPrompt);
-		//});
+		std::thread completion_thread([&](){
+			completion = aiService.createCompletion(fullPrompt);
+		});
 
-		//// loader animation
-		//while (completion == "") {
-		//	std::cout << loader.draw();
-		//}
-		//std::cout << "\r\x1b[2K"; //carriage return and clear line
+		// loader animation
+		while (completion == "") {
+			std::cout << loader.draw();
+		}
+		std::cout << "\r\x1b[2K"; //carriage return and clear line
 
-		//completion_thread.join();
+		completion_thread.join();
 
-		completion = "this is an example comletion";
-
+		// display result
+		if (selectedOption == -1 || selectedOption == IMPROVE) { generatedCommand = completion; }
 		outputFrame.setContent(completion);
 		std::cout << outputFrame.draw() << std::endl << std::endl;
 		
-		int selectedOption = -1;
+		// get next action 
+		selectedOption = -1;
 		while (selectedOption < 0 ) {
 			std::cout << tabSelector.draw();
 			selectedOption = tabSelector.getInput();
@@ -79,15 +94,16 @@ void powershellHelp(std::string prompt, char* model) {
 
 		switch (selectedOption)
 		{
-		case 0:
-			// run code
+		case COPY:
+			// copy to clipboard
+			copyToClipboard(generatedCommand);
 			responseComplete = true;
 			break;
-		case 1:
+		case EXPLAIN:
 			// explain code
 			fullPrompt = "Explain the command you generated.";
 			break;
-		case 2:
+		case IMPROVE:
 			// improve
 			std::cout << "How should I improve the command?\n-> ";
 			char prompt_c[1000];
@@ -95,12 +111,12 @@ void powershellHelp(std::string prompt, char* model) {
 			fullPrompt = "Change the command you created according to the following (your reply must only contain the command, nothing else): ";
 			fullPrompt.append(prompt_c);
 			break;
-		case 3:
-			// copy to clipboard
-			copyToClipboard(completion);
-			responseComplete = true;
-			break;
-		case 4:
+		//case RUN:
+		//	// run code
+		//	system(completion.c_str());
+		//	responseComplete = true;
+		//	break;
+		case QUIT:
 			responseComplete = true;
 			break;
 		default:
