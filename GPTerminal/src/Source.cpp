@@ -8,6 +8,7 @@
 
 void chat(char* model);
 void powershellHelp(std::string prompt, char* model);
+void copyToClipboard(std::string textToCopy);
 
 int main(int argc, char** argv) {
     char model[] = "gpt-3.5-turbo";
@@ -52,17 +53,19 @@ void powershellHelp(std::string prompt, char* model) {
 
 		// create completion
 		std::string completion;
-		std::thread completion_thread([&](){
-			completion = aiService.createCompletion(fullPrompt);
-		});
+		//std::thread completion_thread([&](){
+		//	completion = aiService.createCompletion(fullPrompt);
+		//});
 
-		// loader animation
-		while (completion == "") {
-			std::cout << loader.draw();
-		}
-		std::cout << "\r\x1b[2K"; //carriage return and clear line
+		//// loader animation
+		//while (completion == "") {
+		//	std::cout << loader.draw();
+		//}
+		//std::cout << "\r\x1b[2K"; //carriage return and clear line
 
-		completion_thread.join();
+		//completion_thread.join();
+
+		completion = "this is an example comletion";
 
 		outputFrame.setContent(completion);
 		std::cout << outputFrame.draw() << std::endl << std::endl;
@@ -94,6 +97,7 @@ void powershellHelp(std::string prompt, char* model) {
 			break;
 		case 3:
 			// copy to clipboard
+			copyToClipboard(completion);
 			responseComplete = true;
 			break;
 		case 4:
@@ -145,4 +149,17 @@ void chat(char* model) {
 		std::cout << completion << std::endl;
 		std::cout << hline.draw() << std::endl << std::endl;
     }
+}
+
+void copyToClipboard(std::string textToCopy) {
+	const char* text = textToCopy.c_str();
+	const size_t len = strlen(text) + 1;
+
+	HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, len);
+	memcpy(GlobalLock(hMem), text, len);
+
+	OpenClipboard(0);
+	EmptyClipboard();
+	SetClipboardData(CF_TEXT, hMem);
+	CloseClipboard();
 }
