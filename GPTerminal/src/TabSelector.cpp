@@ -11,7 +11,7 @@ std::string TabSelector::draw() {
 	output.append("\r"); // carriage return
 	output.append("\x1b[2K"); //clear line
 
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < this->options.size(); i++) {
 		if (this->selectedOption == i) {
 			output.append("\x1b[7m"); // reverse terminal colors
 			output.append("> ");
@@ -38,11 +38,11 @@ int TabSelector::getInput() {
 
 		switch (key = _getch()) {
 		case 77: // arrow left
-			this->selectedOption = (this->selectedOption + 1) % 4;
+			this->selectedOption = (this->selectedOption + 1) % this->options.size();
 			break;
 		case 75: // arrow right
 			this->selectedOption = (this->selectedOption -1) % 4;
-			if (this->selectedOption < 0) { this->selectedOption = 4; }
+			if (this->selectedOption < 0) { this->selectedOption = this->options.size(); }
 			break;
 		}
 	
@@ -50,7 +50,7 @@ int TabSelector::getInput() {
 	else {
 		switch (c) {
 		case '\t':
-			this->selectedOption = (this->selectedOption + 1) % 4;
+			this->selectedOption = (this->selectedOption + 1) % this->options.size();
 			break;
 		case '\r':
 			return this->selectedOption;
