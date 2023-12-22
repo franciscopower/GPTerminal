@@ -30,7 +30,7 @@ std::string Frame::draw() {
 		output.append(" ");
 		output.append(this->title);
 		output.append(" ");
-		restOfLineLenght = restOfLineLenght - 2 - this->title.length();
+		restOfLineLenght = restOfLineLenght - 2 - int(this->title.length());
 	}
 	//draw start line
 	for (int i = 0; i < restOfLineLenght; i++) {

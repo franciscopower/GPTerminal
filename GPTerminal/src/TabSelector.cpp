@@ -31,18 +31,18 @@ std::string TabSelector::draw() {
 }
 
 int TabSelector::getInput() {
-	int key;
+	int key = 0;
 	int c = _getch();
 
 	if (!c || c == 224) { // check if they're extended char
 
 		switch (key = _getch()) {
 		case 77: // arrow left
-			this->selectedOption = (this->selectedOption + 1) % this->options.size();
+			this->selectedOption = (this->selectedOption + 1) % int(this->options.size());
 			break;
 		case 75: // arrow right
 			this->selectedOption = (this->selectedOption -1) % 4;
-			if (this->selectedOption < 0) { this->selectedOption = this->options.size(); }
+			if (this->selectedOption < 0) { this->selectedOption = int(this->options.size()); }
 			break;
 		}
 	
@@ -50,7 +50,7 @@ int TabSelector::getInput() {
 	else {
 		switch (c) {
 		case '\t':
-			this->selectedOption = (this->selectedOption + 1) % this->options.size();
+			this->selectedOption = (this->selectedOption + 1) % int(this->options.size());
 			break;
 		case '\r':
 			return this->selectedOption;

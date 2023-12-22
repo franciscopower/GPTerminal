@@ -45,7 +45,7 @@ std::string HLine::draw() {
 	std::string output;
 
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
-	int winColumns, winRows;
+	int winColumns;
 
 	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
 	winColumns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
@@ -58,7 +58,7 @@ std::string HLine::draw() {
 		output.append(" ");
 		output.append(this->title);
 		output.append(" ");
-		restOflineLenght = restOflineLenght - 2 - this->title.length();
+		restOflineLenght = restOflineLenght - 2 - int(this->title.length());
 	}
 
 	//draw start line
