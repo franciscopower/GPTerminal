@@ -10,6 +10,11 @@
 4. In your computer, create an **Environmental Variable* called "OPENAI_API_KEY" and paste your API key in the value field;
 5. Still in the environmental variables editor, add the folder where you placed the GPTerminal.exe file to the path;
 
+*Tip*: add an alias to your Powershell profile:
+1. `notepad $PROFILE`
+2. add the line: `New-Alias ai GPTerminal.exe`
+This way, you can use "ai" instead of "GPTerminal.exe" in Powershell
+
 ## Usage
 
 ### Powershell help
