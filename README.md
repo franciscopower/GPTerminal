@@ -27,12 +27,18 @@ GPTerminal.exe list all files in the current directory that have the .txt extens
 ```
 GPT will generate a command to fullfill that request.
 Once the code is generated, use the *tab* or *arrow* keys to chose an option (copy to clipboard, improve, explain or quit).
+Example:
+![image](https://github.com/franciscopower/GPTerminal/assets/33499683/5f680e41-2ffa-4185-9539-df89396cf6dd)
+
 
 ### Chat
 To have a normal chat with chat-gpt, just use the command 
 ```ps
 GPTerminal.exe chat
 ```
+Example:
+![image](https://github.com/franciscopower/GPTerminal/assets/33499683/30b33acc-2431-4cde-802e-406a41ddfccb)
+
 
 ## Contributing
 Feel free to contribute to the project, report bugs, request features or even review my code. 
