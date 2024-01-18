@@ -2,6 +2,26 @@
 #include <Windows.h>
 #include <iostream>
 
+#define COLOR_RESET   "\033[0m"
+#define COLOR_BLACK   "\033[30m"      /* Black */
+#define COLOR_RED     "\033[31m"      /* Red */
+#define COLOR_GREEN   "\033[32m"      /* Green */
+#define COLOR_YELLOW  "\033[33m"      /* Yellow */
+#define COLOR_BLUE    "\033[34m"      /* Blue */
+#define COLOR_MAGENTA "\033[35m"      /* Magenta */
+#define COLOR_CYAN    "\033[36m"      /* Cyan */
+#define COLOR_WHITE   "\033[37m"      /* White */
+#define COLOR_DARKGRAY   "\033[90m"      /* GRAY */
+#define COLOR_BOLD	  "\033[1m"		  /* Bold */
+#define COLOR_UNDERLINE "\033[1m"		  /* Underline */
+
+#define HLINE     "\xC4"
+#define VLINE     "\xB3"
+#define ULCORNER  "\xDA"
+#define URCORNER  "\xBF"
+#define LRCORNER  "\xD9"
+#define LLCORNER  "\xC0"
+
 Frame::Frame(std::string title) {
 	this->title = title;
 }
@@ -14,6 +34,9 @@ void Frame::setContent(std::string content) {
 }
 
 std::string Frame::draw() {
+
+	const char border_color[] = COLOR_DARKGRAY;
+
 	std::string output;
 
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
@@ -23,7 +46,8 @@ std::string Frame::draw() {
 	winColumns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
 	winRows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
 
-	output.append(ulcorner);
+	output.append(border_color);
+	output.append(ULCORNER);
 	int restOfLineLenght = winColumns - 2; 
 	// add title
 	if (this->title != "") {
@@ -34,9 +58,10 @@ std::string Frame::draw() {
 	}
 	//draw start line
 	for (int i = 0; i < restOfLineLenght; i++) {
-		output.append(hline);
+		output.append(HLINE);
 	}
-	output.append(urcorner);
+	output.append(URCORNER);
+	output.append(COLOR_RESET);
 	
 	//split string into lines
 	std::vector<std::string> contentLines = split(content, "\n");
@@ -48,7 +73,9 @@ std::string Frame::draw() {
 		contentWords = split(l, " ");
 
 		lineLengh = 0;
-		output.append(vline); // vertical line at start of line
+		output.append(border_color);
+		output.append(VLINE); // vertical line at start of line
+		output.append(COLOR_RESET);
 		for (std::string w : contentWords) {
 			lineLengh += w.length();
 
@@ -59,9 +86,11 @@ std::string Frame::draw() {
 					output.append(" ");
 					lineLengh++;
 				}
-				output.append(vline); 
+				output.append(border_color);
+				output.append(VLINE); 
 				output.append("\n");
-				output.append(vline);
+				output.append(VLINE);
+				output.append(COLOR_RESET);
 				output.append(" "); // blank space at the beginning
 				lineLengh = w.length() + 1;
 			}
@@ -77,16 +106,20 @@ std::string Frame::draw() {
 			lineLengh++;
 		}
 
-		output.append(vline); // vertical line at the end of line
+		output.append(border_color);
+		output.append(VLINE); // vertical line at the end of line
+		output.append(COLOR_RESET);
 		output.append("\n");
 	}
 
 	//draw end line
-	output.append(llcorner);
+	output.append(border_color);
+	output.append(LLCORNER);
 	for (int i = 0; i < winColumns-2; i++) {
-		output.append(hline);
+		output.append(HLINE);
 	}
-	output.append(lrcorner);
+	output.append(LRCORNER);
+	output.append(COLOR_RESET);
 
 
  

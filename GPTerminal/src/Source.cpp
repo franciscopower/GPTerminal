@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <windows.h>
 #include <vector>
 #include <thread>
@@ -14,6 +14,19 @@
 #include "HLine.h"
 #include "AiCompletionService.h"
 
+#define COLOR_RESET   "\033[0m"
+#define COLOR_BLACK   "\033[30m"      /* Black */
+#define COLOR_RED     "\033[31m"      /* Red */
+#define COLOR_GREEN   "\033[32m"      /* Green */
+#define COLOR_YELLOW  "\033[33m"      /* Yellow */
+#define COLOR_BLUE    "\033[34m"      /* Blue */
+#define COLOR_MAGENTA "\033[35m"      /* Magenta */
+#define COLOR_CYAN    "\033[36m"      /* Cyan */
+#define COLOR_WHITE   "\033[37m"      /* White */
+#define COLOR_DARKGRAY   "\033[90m"      /* GRAY */
+#define COLOR_BOLD	  "\033[1m"		  /* Bold */
+#define COLOR_UNDERLINE "\033[1m"		  /* Underline */
+
 void chat(char* model);
 void powershellHelp(std::string prompt, char* model);
 void copyToClipboard(std::string textToCopy);
@@ -22,7 +35,6 @@ int main(int argc, char** argv) {
     char model[] = "gpt-3.5-turbo";
 
 	if ((argc == 2 && strcmp(argv[1],"chat") == 0) || argc < 2) {
-		std::cout << "Let's chat! When you want to quit, just type 'quit'." << std::endl;
 		chat(model);
 	} 
 	else {
@@ -33,6 +45,8 @@ int main(int argc, char** argv) {
 		}
 		powershellHelp(prompt, model);
 	}
+	
+	std::cout << COLOR_RESET;
 
     return 0;
 }
@@ -79,12 +93,13 @@ void powershellHelp(std::string prompt, char* model) {
 		});
 
 		// loader animation
+		std::cout << COLOR_YELLOW;
 		_setmode(_fileno(stdout), _O_U8TEXT);
 		while (completion == "") {
 			std::wcout << loader.wdraw();
 		}
 		_setmode(_fileno(stdout), _O_TEXT);
-		std::cout << "\r\x1b[2K"; //carriage return and clear line
+		std::cout << COLOR_RESET << "\r\x1b[2K"; //carriage return and clear line
 
 		completion_thread.join();
 
@@ -114,7 +129,8 @@ void powershellHelp(std::string prompt, char* model) {
 			break;
 		case IMPROVE:
 			// improve
-			std::cout << "How should I improve the command?\n-> ";
+			std::cout << "How should I improve the command?" << std::endl;
+			std::cout << COLOR_YELLOW << "-> " << COLOR_RESET;
 			char prompt_c[1000];
 			std::cin.getline(prompt_c, 1000);
 			fullPrompt = "Change the command you created according to the following (your reply must only contain the command, nothing else): ";
@@ -142,10 +158,12 @@ void chat(char* model) {
     AiCompletionService aiService = AiCompletionService(model);
 
 	Loader loader(Loader::DOTS, "Generating...");
+	
+	std::cout << "Let's chat! And when you want to quit, just type 'quit' or 'q' :)" << std::endl;
 
     while (true) {
 
-		std::cout << "Message: ";
+		std::cout << COLOR_DARKGRAY << "You: " << COLOR_RESET;
 		char prompt_c[1000];
 		std::cin.getline(prompt_c, 1000);
 		std::string prompt = prompt_c;
@@ -159,12 +177,13 @@ void chat(char* model) {
 		});
 
 		// loader animation
+		std::cout << COLOR_YELLOW;
 		_setmode(_fileno(stdout), _O_U8TEXT);
 		while (completion == "") {
 			std::wcout << loader.wdraw();
 		}
 		_setmode(_fileno(stdout), _O_TEXT);
-		std::cout << "\r\x1b[2K"; //carriage return and clear line
+		std::cout << COLOR_RESET << "\r\x1b[2K"; //carriage return and clear line
 
 		completion_thread.join();
 
@@ -173,9 +192,9 @@ void chat(char* model) {
 
 		HLine hlinetitle("GPT");
 		HLine hline("");
-		std::cout << hlinetitle.draw() << std::endl;
+		std::cout << COLOR_DARKGRAY << hlinetitle.draw() << COLOR_RESET << std::endl;
 		std::cout << completion << std::endl;
-		std::cout << hline.draw() << std::endl << std::endl;
+		std::cout << COLOR_DARKGRAY << hline.draw() << std::endl << COLOR_RESET << std::endl;
     }
 }
 
