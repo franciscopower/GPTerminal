@@ -4,6 +4,8 @@
 #include <string>
 #include <thread>
 #include <chrono>
+#include <codecvt>
+#include <locale>
 
 class Loader : Component
 {
@@ -11,29 +13,22 @@ public:
 	enum Style
 	{
 		DOTS,
-		TOGGLE,
 		ARC,
-		BALL,
 		BAR
 	};
 
 	Loader(Style style, std::string text) {
 
-		this->text = text;
+		// Convert narrow string to wide string
+		this->text = std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(text);
 			
 		switch (style)
 		{
 		case Loader::DOTS:
 			copy(begin(this->frames_dots), end(this->frames_dots), back_inserter(this->frames));
 			break;
-		case Loader::TOGGLE:
-			copy(begin(this->frames_toggle), end(this->frames_toggle), back_inserter(this->frames));
-			break;
 		case Loader::ARC:
 			copy(begin(this->frames_arc), end(this->frames_arc), back_inserter(this->frames));
-			break;
-		case Loader::BALL:
-			copy(begin(this->frames_ball), end(this->frames_ball), back_inserter(this->frames));
 			break;
 		case Loader::BAR:
 			copy(begin(this->frames_bar), end(this->frames_bar), back_inserter(this->frames));
@@ -45,10 +40,14 @@ public:
 	};
 
 	std::string draw() {
-		std::string output = "";
+		throw std::logic_error("Use `wdraw()` instead (outputs a std::wstring instead of std::string)");
+	}
 
-		output.append("\r"); // carriage return
-		output.append("\x1b[2K"); //clear line
+	std::wstring wdraw() {
+		std::wstring output = L"";
+
+		output.append(L"\r"); // carriage return
+		output.append(L"\x1b[2K"); //clear line
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(80));
 
@@ -58,7 +57,7 @@ public:
 		}
 
 		output.append(this->frames[this->index]);
-		output.append(" ");
+		output.append(L" ");
 		output.append(this->text);
 
 		return output;
@@ -67,82 +66,37 @@ public:
 private:
 
 	size_t index = 0;
-	std::string text;
-	std::string output;
+	std::wstring text;
 
-	std::vector<std::string> frames;
+	std::vector<std::wstring> frames;
 
-	const std::string frames_dots[10] = {
-		"⠋",
-		"⠙",
-		"⠹",
-		"⠸",
-		"⠼",
-		"⠴",
-		"⠦",
-		"⠧",
-		"⠇",
-		"⠏"
+	const std::wstring frames_dots[10] = {
+		L"⠋",
+		L"⠙",
+		L"⠹",
+		L"⠸",
+		L"⠼",
+		L"⠴",
+		L"⠦",
+		L"⠧",
+		L"⠇",
+		L"⠏"
 	};
 
-	const std::string frames_toggle[2] = {
-		"⊶",
-		"⊷" 
+	const std::wstring frames_arc[6] = {
+		L"◜",
+		L"◠",
+		L"◝",
+		L"◞",
+		L"◡",
+		L"◟" 
 	};
 
-	const std::string frames_arc[6] = {
-		"◜",
-		"◠",
-		"◝",
-		"◞",
-		"◡",
-		"◟" 
-	};
-
-	//const std::string frames_ball[10] = {
-	//	"( " + "\x25CF" + "    )",
-	//	"(  ●   )",
-	//	"(   ●  )",
-	//	"(    ● )",
-	//	"(     ●)",
-	//	"(    ● )",
-	//	"(   ●  )",
-	//	"(  ●   )",
-	//	"( ●    )",
-	//	"(●     )"
-	//};
-
-	//const std::string frames_ball[10] = {
-	//	"( ●    )",
-	//	"(  ●   )",
-	//	"(   ●  )",
-	//	"(    ● )",
-	//	"(     ●)",
-	//	"(    ● )",
-	//	"(   ●  )",
-	//	"(  ●   )",
-	//	"( ●    )",
-	//	"(●     )"
-	//};
-
-	const std::string frames_ball[10] = {
-		"| 0    |",
-		"|  0   |",
-		"|   0  |",
-		"|    0 |",
-		"|     0|",
-		"|    0 |",
-		"|   0  |",
-		"|  0   |",
-		"| 0    |",
-		"|0     |"
-	};
-
-	const std::string frames_bar[4] = {
-		"|",
-		"/",
-		"-",
-		"\\",
+	const std::wstring frames_bar[4] = {
+		L"|",
+		L"/",
+		L"-",
+		L"\\"
 	};
 
 };

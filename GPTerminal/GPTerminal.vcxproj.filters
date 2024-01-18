@@ -44,9 +44,6 @@
     <ClInclude Include="include\Frame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\PowerTUI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\AiCompletionService.h">
       <Filter>Header Files</Filter>
     </ClInclude>

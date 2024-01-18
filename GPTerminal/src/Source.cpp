@@ -4,7 +4,14 @@
 #include <thread>
 #include <filesystem>
 
-#include "PowerTUI.h"
+#include <fcntl.h> // for _setmode
+#include <io.h> // for _setmode
+#include <stdio.h> // for _fileno
+
+#include "Frame.h"
+#include "TabSelector.h"
+#include "Loader.h"
+#include "HLine.h"
 #include "AiCompletionService.h"
 
 void chat(char* model);
@@ -29,7 +36,7 @@ int main(int argc, char** argv) {
 
     return 0;
 }
-
+ 
 void powershellHelp(std::string prompt, char* model) {
 
     AiCompletionService aiService = AiCompletionService(model);
@@ -52,7 +59,7 @@ void powershellHelp(std::string prompt, char* model) {
 	};
 	TabSelector tabSelector(options);
 	Frame outputFrame("GPT");
-	Loader loader(Loader::BAR, "Generating...");
+	Loader loader(Loader::DOTS, "Generating...");
 
 	std::string fullPrompt = "Keeping in mind that the current working directory is '";
 	fullPrompt.append(std::filesystem::current_path().string());
@@ -72,9 +79,11 @@ void powershellHelp(std::string prompt, char* model) {
 		});
 
 		// loader animation
+		_setmode(_fileno(stdout), _O_U8TEXT);
 		while (completion == "") {
-			std::cout << loader.draw();
+			std::wcout << loader.wdraw();
 		}
+		_setmode(_fileno(stdout), _O_TEXT);
 		std::cout << "\r\x1b[2K"; //carriage return and clear line
 
 		completion_thread.join();
@@ -132,6 +141,8 @@ void chat(char* model) {
 
     AiCompletionService aiService = AiCompletionService(model);
 
+	Loader loader(Loader::DOTS, "Generating...");
+
     while (true) {
 
 		std::cout << "Message: ";
@@ -142,16 +153,17 @@ void chat(char* model) {
 		if (prompt == "q" || prompt == "quit")
 			break;
 
-		std::string completion;
+		std::string completion; //TODO: explore mutex
 		std::thread completion_thread([&](){
 			completion = aiService.createCompletion(prompt);
 		});
 
 		// loader animation
-		Loader loader(Loader::BAR, "Generating...");
+		_setmode(_fileno(stdout), _O_U8TEXT);
 		while (completion == "") {
-			std::cout << loader.draw();
+			std::wcout << loader.wdraw();
 		}
+		_setmode(_fileno(stdout), _O_TEXT);
 		std::cout << "\r\x1b[2K"; //carriage return and clear line
 
 		completion_thread.join();
