@@ -1,4 +1,6 @@
 #pragma once
+#include <optional>
+
 #include "ChatApi.h"
 #include "Result.h"
 
@@ -9,9 +11,9 @@ public:
 	OpenAiApi();
 	~OpenAiApi();
 	Result<std::string, std::string> createPrompt(std::string user_input);
-	std::string decodeReply(std::string);
+	Result<std::string, std::string> decodeReply(std::string api_reply);
 
-	void setServiceHeaders();
+	Result<ServiceHeaders*, std::string> setServiceHeaders();
 	ServiceHeaders* getServiceHeaders();
 
 private:

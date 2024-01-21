@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <optional>
 #include <json.hpp>
 #include "Result.h"
 
@@ -32,12 +33,12 @@ protected:
 	const char* model;
 
 	ServiceHeaders service_headers;
-	virtual void setServiceHeaders() = 0;
+	virtual Result<ServiceHeaders*, std::string> setServiceHeaders() = 0;
 	
 public:
 
 	virtual Result<std::string, std::string> createPrompt(std::string user_input) = 0;
-	virtual std::string decodeReply(std::string api_reply) = 0;
+	virtual Result<std::string, std::string> decodeReply(std::string api_reply) = 0;
 
 	virtual ServiceHeaders* getServiceHeaders() = 0;
 

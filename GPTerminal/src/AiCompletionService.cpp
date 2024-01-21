@@ -11,10 +11,15 @@
 AiCompletionService::AiCompletionService() {}
 
 auto AiCompletionService::init(char* model) -> std::optional<std::string> {
-    ServiceHeaders* service_headers;
 
     this->openai_chat_api = OpenAiApi(model);
-    service_headers = this->openai_chat_api.getServiceHeaders();
+    
+    ServiceHeaders* service_headers;
+    auto service_headers_r = this->openai_chat_api.setServiceHeaders();
+    if (service_headers_r.is_ok)
+        service_headers = service_headers_r.value;
+    else
+        return service_headers_r.error;
 
     // CURL initialization
     curl_global_init(CURL_GLOBAL_ALL);
@@ -63,13 +68,14 @@ auto AiCompletionService::createCompletion(std::string user_input) -> Result<std
     // perform request
     this->res = curl_easy_perform(this->curl);
 
-    if (this->res!= CURLE_OK) {
+    if (this->res!= CURLE_OK)
         return Result<std::string, std::string>::Err(curl_easy_strerror(this->res));
-    }
 
-    std::string reply = this->openai_chat_api.decodeReply(this->api_reply);
-
-    return Result<std::string, std::string>::Ok(reply);
+    auto reply_r = this->openai_chat_api.decodeReply(this->api_reply);
+    if (!reply_r.is_ok)
+        return Result<std::string, std::string>::Err(reply_r.error);
+        
+    return Result<std::string, std::string>::Ok(reply_r.value);
 }
 
 size_t AiCompletionService::decodeCompletion(char* data, size_t size, size_t nmemb, void* userdata) {
