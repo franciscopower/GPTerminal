@@ -8,6 +8,10 @@
 #include <io.h> // for _setmode
 #include <stdio.h> // for _fileno
 
+#include <optional>
+
+#include "Result.h"
+
 #include "Frame.h"
 #include "TabSelector.h"
 #include "Loader.h"
@@ -27,15 +31,16 @@
 #define COLOR_BOLD	  "\033[1m"		  /* Bold */
 #define COLOR_UNDERLINE "\033[1m"		  /* Underline */
 
-void chat(char* model);
-void powershellHelp(std::string prompt, char* model);
+std::optional<int> chat(char* model);
+std::optional<int> powershellHelp(std::string prompt, char* model);
 void copyToClipboard(std::string textToCopy);
 
 int main(int argc, char** argv) {
     char model[] = "gpt-3.5-turbo";
+	std::optional<int> returned_error;
 
 	if ((argc == 2 && strcmp(argv[1],"chat") == 0) || argc < 2) {
-		chat(model);
+		returned_error = chat(model);
 	} 
 	else {
 		std::string prompt = "";
@@ -43,17 +48,22 @@ int main(int argc, char** argv) {
 			prompt.append(argv[i]);
 			prompt.append(" ");
 		}
-		powershellHelp(prompt, model);
+		returned_error = powershellHelp(prompt, model);
 	}
 	
 	std::cout << COLOR_RESET;
 
-    return 0;
+	if (returned_error.has_value())
+		return 1;
+	else
+		return 0;
 }
  
-void powershellHelp(std::string prompt, char* model) {
+std::optional<int> powershellHelp(std::string prompt, char* model) {
 
-    AiCompletionService aiService = AiCompletionService(model);
+    AiCompletionService aiService = AiCompletionService();
+	aiService.init(model);
+
 	bool responseComplete = false;
 
 	// set TUI
@@ -87,15 +97,15 @@ void powershellHelp(std::string prompt, char* model) {
 	while (!responseComplete) {
 
 		// create completion
-		std::string completion;
-		std::thread completion_thread([&](){
-			completion = aiService.createCompletion(fullPrompt);
-		});
+		Result<std::string, std::string> completion_r;
+		std::thread completion_thread([&]() {
+			completion_r = aiService.createCompletion(prompt);
+			});
 
 		// loader animation
 		std::cout << COLOR_YELLOW;
 		_setmode(_fileno(stdout), _O_U8TEXT);
-		while (completion == "") {
+		while (completion_r.value == "" && completion_r.error == "") {
 			std::wcout << loader.wdraw();
 		}
 		_setmode(_fileno(stdout), _O_TEXT);
@@ -104,10 +114,16 @@ void powershellHelp(std::string prompt, char* model) {
 		completion_thread.join();
 
 		// display result
-		if (selectedOption == -1 || selectedOption == IMPROVE) { generatedCommand = completion; }
-		outputFrame.setContent(completion);
-		std::cout << outputFrame.draw() << std::endl << std::endl;
-		
+		if (completion_r.is_ok) {
+			if (selectedOption == -1 || selectedOption == IMPROVE) { generatedCommand = completion_r.value; }
+			outputFrame.setContent(completion_r.value);
+			std::cout << outputFrame.draw() << std::endl << std::endl;
+		}
+		else {
+			std::cerr << COLOR_RED << "[ERROR] - " << completion_r.error << COLOR_RESET << std::endl;
+			return 1;
+		}
+
 		// get next action 
 		selectedOption = -1;
 		while (selectedOption < 0 ) {
@@ -149,19 +165,25 @@ void powershellHelp(std::string prompt, char* model) {
 			break;
 		}
 	}
-
+	return {};
 }
 
 
-void chat(char* model) {
-
-    AiCompletionService aiService = AiCompletionService(model);
+std::optional<int> chat(char* model) {
 
 	Loader loader(Loader::DOTS, "Generating...");
-	
+    AiCompletionService aiService = AiCompletionService();
+
 	std::cout << "Let's chat! And when you want to quit, just type 'quit' or 'q' :)" << std::endl;
 
-    while (true) {
+	std::optional<std::string> ai_init_error = aiService.init(model);
+	if (ai_init_error.has_value()) {
+		std::cerr << COLOR_RED << "[ERROR] - " << ai_init_error.value() << COLOR_RESET << std::endl;
+		return 1;
+	}
+
+
+	while (true) {
 
 		std::cout << COLOR_DARKGRAY << "You: " << COLOR_RESET;
 		char prompt_c[1000];
@@ -171,15 +193,15 @@ void chat(char* model) {
 		if (prompt == "q" || prompt == "quit")
 			break;
 
-		std::string completion; //TODO: explore mutex
-		std::thread completion_thread([&](){
-			completion = aiService.createCompletion(prompt);
+		Result<std::string, std::string> completion_r;
+		std::thread completion_thread([&]() {
+			completion_r = aiService.createCompletion(prompt);
 		});
 
 		// loader animation
 		std::cout << COLOR_YELLOW;
 		_setmode(_fileno(stdout), _O_U8TEXT);
-		while (completion == "") {
+		while (completion_r.value == "" && completion_r.error == "") {
 			std::wcout << loader.wdraw();
 		}
 		_setmode(_fileno(stdout), _O_TEXT);
@@ -187,15 +209,20 @@ void chat(char* model) {
 
 		completion_thread.join();
 
-		//Frame outputFrame("GPT");
-		//outputFrame.setContent(completion);
+		if (completion_r.is_ok) {
+			HLine hlinetitle("GPT");
+			HLine hline("");
+			std::cout << COLOR_DARKGRAY << hlinetitle.draw() << COLOR_RESET << std::endl;
+			std::cout << completion_r.value << std::endl;
+			std::cout << COLOR_DARKGRAY << hline.draw() << std::endl << COLOR_RESET << std::endl;
+		}
+		else {
+			std::cerr << COLOR_RED << "[ERROR] - " <<completion_r.error << COLOR_RESET << std::endl;
+			return 1;
+		}
 
-		HLine hlinetitle("GPT");
-		HLine hline("");
-		std::cout << COLOR_DARKGRAY << hlinetitle.draw() << COLOR_RESET << std::endl;
-		std::cout << completion << std::endl;
-		std::cout << COLOR_DARKGRAY << hline.draw() << std::endl << COLOR_RESET << std::endl;
     }
+	return {};
 }
 
 void copyToClipboard(std::string textToCopy) {

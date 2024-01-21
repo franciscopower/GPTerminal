@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <json.hpp>
+#include "Result.h"
 
 #define URL_MAX_SIZE 100
 #define BEARER_TOKEN_MAX_SIZE 300
@@ -35,7 +36,7 @@ protected:
 	
 public:
 
-	virtual std::string createPrompt(std::string user_input) = 0;
+	virtual Result<std::string, std::string> createPrompt(std::string user_input) = 0;
 	virtual std::string decodeReply(std::string api_reply) = 0;
 
 	virtual ServiceHeaders* getServiceHeaders() = 0;

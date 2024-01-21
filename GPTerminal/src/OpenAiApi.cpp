@@ -1,8 +1,9 @@
 #include <iostream>
 
+#include "Result.h"
 #include "OpenAiApi.h"
 
-std::string OpenAiApi::createPrompt(std::string prompt) {
+auto OpenAiApi::createPrompt(std::string prompt) -> Result<std::string, std::string> {
 		
     this->chat.push_back({ "user", prompt });
     nlohmann::json api_request;
@@ -17,12 +18,12 @@ std::string OpenAiApi::createPrompt(std::string prompt) {
 		}
 		api_request["messages"] = json_messages;
     }
-    catch (const std::exception&)
+    catch (const std::exception& e)
     {
-        return ""; //TODO: Return error code
+        return Result<std::string, std::string>::Err(e.what());
     }
     
-    return api_request.dump(); //TODO: Return error code
+    return Result<std::string, std::string>::Ok(api_request.dump()); 
 
 }
 std::string OpenAiApi::decodeReply(std::string api_reply) {

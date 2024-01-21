@@ -1,23 +1,26 @@
 #include <cstdlib>
 #include <iostream>
 
+#include <optional>
+#include "Result.h"
+
 #include "AiCompletionService.h"
 #include "json.hpp"
 
 
-AiCompletionService::AiCompletionService(char* model)
-{
+AiCompletionService::AiCompletionService() {}
+
+auto AiCompletionService::init(char* model) -> std::optional<std::string> {
     ServiceHeaders* service_headers;
 
-    openai_chat_api = OpenAiApi(model);
-    service_headers = openai_chat_api.getServiceHeaders();
+    this->openai_chat_api = OpenAiApi(model);
+    service_headers = this->openai_chat_api.getServiceHeaders();
 
     // CURL initialization
     curl_global_init(CURL_GLOBAL_ALL);
     this->curl = curl_easy_init();
     if (!this->curl) {
-        std::cout << "[ERROR] - Cannot initialize CURL" << std::endl;
-        return; //TODO: Return an error
+        return "Error initializing CURL";
     }
 
     // create headers
@@ -39,12 +42,20 @@ AiCompletionService::AiCompletionService(char* model)
     curl_easy_setopt(this->curl, CURLOPT_WRITEFUNCTION, &AiCompletionService::decodeCompletion);
     curl_easy_setopt(this->curl, CURLOPT_WRITEDATA, (void *)&(this->api_reply));
 
+    return {};
 }
 
-std::string AiCompletionService::createCompletion(std::string user_input) {
+auto AiCompletionService::createCompletion(std::string user_input) -> Result<std::string, std::string>{
     this->api_reply = "";
 
-    std::string prompt = this->openai_chat_api.createPrompt(user_input);
+    auto openai_chat_api_r = this->openai_chat_api.createPrompt(user_input);
+    std::string prompt;
+    if (openai_chat_api_r.is_ok) {
+        prompt = openai_chat_api_r.value;
+    } else {
+        return Result<std::string, std::string>::Err(openai_chat_api_r.error);
+    }
+
     const char* data = prompt.c_str();
     //const char* data = R"({"messages":[{"content":"hey","role":"user"}],"model":"gpt-3.5-turbo"})";
     curl_easy_setopt(this->curl, CURLOPT_POSTFIELDS, data);
@@ -53,12 +64,12 @@ std::string AiCompletionService::createCompletion(std::string user_input) {
     this->res = curl_easy_perform(this->curl);
 
     if (this->res!= CURLE_OK) {
-        std::cout << "[ERROR] - " << curl_easy_strerror(this->res) << std::endl;
+        return Result<std::string, std::string>::Err(curl_easy_strerror(this->res));
     }
 
     std::string reply = this->openai_chat_api.decodeReply(this->api_reply);
 
-    return reply;
+    return Result<std::string, std::string>::Ok(reply);
 }
 
 size_t AiCompletionService::decodeCompletion(char* data, size_t size, size_t nmemb, void* userdata) {

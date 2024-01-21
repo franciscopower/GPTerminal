@@ -1,14 +1,16 @@
 #pragma once
 #include <curl/curl.h>
+#include <optional>
 #include "OpenAiApi.h"
 
 class AiCompletionService
 {
 public:
-	AiCompletionService(char* model);
+	AiCompletionService();
 	~AiCompletionService();
 
-	std::string createCompletion(std::string prompt);
+	Result<std::string, std::string> createCompletion(std::string user_input);
+	std::optional<std::string> init(char* model);
 
 private:
 
