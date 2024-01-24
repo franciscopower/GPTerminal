@@ -99,7 +99,7 @@ std::optional<int> powershellHelp(std::string prompt, char* model) {
 		// create completion
 		Result<std::string, std::string> completion_r;
 		std::thread completion_thread([&]() {
-			completion_r = aiService.createCompletion(prompt);
+			completion_r = aiService.createCompletion(fullPrompt);
 			});
 
 		// loader animation
