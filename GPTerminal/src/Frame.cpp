@@ -1,6 +1,7 @@
 #include "Frame.h"
-#include <Windows.h>
 #include <iostream>
+#include <sys/ioctl.h>
+#include <unistd.h>
 
 #define COLOR_RESET   "\033[0m"
 #define COLOR_BLACK   "\033[30m"      /* Black */
@@ -39,12 +40,10 @@ std::string Frame::draw() {
 
 	std::string output;
 
-	CONSOLE_SCREEN_BUFFER_INFO csbi;
-	int winColumns, winRows;
+	struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+	int winColumns = w.ws_col;
 
-	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
-	winColumns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-	winRows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
 
 	output.append(border_color);
 	output.append(ULCORNER);

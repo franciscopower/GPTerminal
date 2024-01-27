@@ -4,8 +4,6 @@
 #include <string>
 #include <thread>
 #include <chrono>
-#include <codecvt>
-#include <locale>
 
 class Loader : Component
 {
@@ -19,9 +17,6 @@ public:
 
 	Loader(Style style, std::string text) {
 
-		// Convert narrow string to wide string
-		this->text = std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(text);
-			
 		switch (style)
 		{
 		case Loader::DOTS:
@@ -40,14 +35,10 @@ public:
 	};
 
 	std::string draw() {
-		throw std::logic_error("Use `wdraw()` instead (outputs a std::wstring instead of std::string)");
-	}
+		std::string output = "";
 
-	std::wstring wdraw() {
-		std::wstring output = L"";
-
-		output.append(L"\r"); // carriage return
-		output.append(L"\x1b[2K"); //clear line
+		output.append("\r"); // carriage return
+		output.append("\x1b[2K"); //clear line
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(80));
 
@@ -57,7 +48,7 @@ public:
 		}
 
 		output.append(this->frames[this->index]);
-		output.append(L" ");
+		output.append(" ");
 		output.append(this->text);
 
 		return output;
@@ -66,37 +57,37 @@ public:
 private:
 
 	size_t index = 0;
-	std::wstring text;
+	std::string text;
 
-	std::vector<std::wstring> frames;
+	std::vector<std::string> frames;
 
-	const std::wstring frames_dots[10] = {
-		L"⠋",
-		L"⠙",
-		L"⠹",
-		L"⠸",
-		L"⠼",
-		L"⠴",
-		L"⠦",
-		L"⠧",
-		L"⠇",
-		L"⠏"
+	const std::string frames_dots[10] = {
+		"⠋",
+		"⠙",
+		"⠹",
+		"⠸",
+		"⠼",
+		"⠴",
+		"⠦",
+		"⠧",
+		"⠇",
+		"⠏"
 	};
 
-	const std::wstring frames_arc[6] = {
-		L"◜",
-		L"◠",
-		L"◝",
-		L"◞",
-		L"◡",
-		L"◟" 
+	const std::string frames_arc[6] = {
+		"◜",
+		"◠",
+		"◝",
+		"◞",
+		"◡",
+		"◟" 
 	};
 
-	const std::wstring frames_bar[4] = {
-		L"|",
-		L"/",
-		L"-",
-		L"\\"
+	const std::string frames_bar[4] = {
+		"|",
+		"/",
+		"-",
+		"\\"
 	};
 
 };

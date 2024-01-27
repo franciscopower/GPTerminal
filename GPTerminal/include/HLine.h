@@ -1,8 +1,10 @@
 #pragma once
 #include <string>
-#include <Windows.h>
 #include <iostream>
 #include "Component.h"
+
+#include <sys/ioctl.h>
+#include <unistd.h>
 
 class HLine : Component
 {
@@ -44,11 +46,9 @@ void HLine::setTitle(std::string title) {
 std::string HLine::draw() {
 	std::string output;
 
-	CONSOLE_SCREEN_BUFFER_INFO csbi;
-	int winColumns;
-
-	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
-	winColumns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+	struct winsize w;
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+	int winColumns = w.ws_col;
 
 	int restOflineLenght = winColumns - 1;
 
