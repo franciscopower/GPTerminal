@@ -32,7 +32,7 @@ auto AiCompletionService::init(char* model) -> std::optional<std::string> {
     struct curl_slist* headers = NULL;
 
     char curlBearerHeader[BEARER_TOKEN_MAX_SIZE] = "Authorization: Bearer ";
-    strncat_s(curlBearerHeader, BEARER_TOKEN_MAX_SIZE, service_headers->bearer_token, BEARER_TOKEN_MAX_SIZE - 25);
+    strncat(curlBearerHeader, service_headers->bearer_token, BEARER_TOKEN_MAX_SIZE - 25);
 
     headers = curl_slist_append(headers, curlBearerHeader);
     headers = curl_slist_append(headers, "Content-Type: application/json");

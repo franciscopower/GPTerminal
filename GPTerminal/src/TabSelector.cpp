@@ -1,5 +1,5 @@
 #include "TabSelector.h"
-#include "conio.h"
+#include <ncurses.h>
 
 TabSelector::TabSelector(std::vector<std::string> options) {
 	this->options = options;
@@ -31,12 +31,14 @@ std::string TabSelector::draw() {
 }
 
 int TabSelector::getInput() {
+	initscr();
+	refresh();
 	int key = 0;
-	int c = _getch();
+	int c = getch();
 
 	if (!c || c == 224) { // check if they're extended char
 
-		switch (key = _getch()) {
+		switch (key = getch()) {
 		case 77: // arrow left
 			this->selectedOption = (this->selectedOption + 1) % int(this->options.size());
 			break;
@@ -56,6 +58,8 @@ int TabSelector::getInput() {
 			return this->selectedOption;
 		}
 	}
+
+	endwin();
 
 	//return this->selectedOption;
 	return -1; // if an option has not been selected yet

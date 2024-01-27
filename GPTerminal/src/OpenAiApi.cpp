@@ -49,17 +49,14 @@ auto OpenAiApi::decodeReply(std::string api_reply) -> Result<std::string, std::s
 }
 
 Result<ServiceHeaders*, std::string> OpenAiApi::setServiceHeaders() {
-    strncpy_s(this->service_headers.url, "https://api.openai.com/v1/chat/completions", URL_MAX_SIZE);
+    strncpy(this->service_headers.url, "https://api.openai.com/v1/chat/completions", URL_MAX_SIZE);
 
 	size_t sz = 0;
-	char* bearerToken = nullptr;
-	errno_t resEnv = _dupenv_s(&bearerToken, &sz, "OPENAI_API_KEY");
-	if (resEnv != 0 || bearerToken == nullptr) {
-		free(bearerToken);
+	char* bearerToken = std::getenv("OPENAI_API_KEY");
+	if (bearerToken == nullptr) {
         return Result<ServiceHeaders*, std::string>::Err("Could not find API Key");
 	}
-    strncpy_s(this->service_headers.bearer_token, bearerToken, BEARER_TOKEN_MAX_SIZE);
-	free(bearerToken);
+    strncpy(this->service_headers.bearer_token, bearerToken, BEARER_TOKEN_MAX_SIZE);
 
     return Result<ServiceHeaders*, std::string>::Ok(& (this->service_headers));
 }

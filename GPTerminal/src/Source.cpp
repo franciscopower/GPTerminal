@@ -1,13 +1,7 @@
 ﻿#include <iostream>
-#include <windows.h>
 #include <vector>
 #include <thread>
 #include <filesystem>
-
-#include <fcntl.h> // for _setmode
-#include <io.h> // for _setmode
-#include <stdio.h> // for _fileno
-
 #include <optional>
 
 #include "Result.h"
@@ -87,7 +81,7 @@ std::optional<int> powershellHelp(std::string prompt, char* model) {
 
 	std::string fullPrompt = "Keeping in mind that the current working directory is '";
 	fullPrompt.append(std::filesystem::current_path().string());
-	fullPrompt.append("', given the following request, create a Windows Powershell command that can solve it (your reply must only contain the command, nothing else): ");
+	fullPrompt.append("', given the following request, create a bash command that can solve it (your reply must only contain the command, nothing else): ");
 	fullPrompt.append(prompt);
 
 	std::string generatedCommand = "";
@@ -104,11 +98,9 @@ std::optional<int> powershellHelp(std::string prompt, char* model) {
 
 		// loader animation
 		std::cout << COLOR_YELLOW;
-		_setmode(_fileno(stdout), _O_U8TEXT);
 		while (completion_r.value == "" && completion_r.error == "") {
-			std::wcout << loader.wdraw();
+			std::cout << loader.draw();
 		}
-		_setmode(_fileno(stdout), _O_TEXT);
 		std::cout << COLOR_RESET << "\r\x1b[2K"; //carriage return and clear line
 
 		completion_thread.join();
@@ -200,11 +192,9 @@ std::optional<int> chat(char* model) {
 
 		// loader animation
 		std::cout << COLOR_YELLOW;
-		_setmode(_fileno(stdout), _O_U8TEXT);
 		while (completion_r.value == "" && completion_r.error == "") {
-			std::wcout << loader.wdraw();
+			std::cout << loader.draw();
 		}
-		_setmode(_fileno(stdout), _O_TEXT);
 		std::cout << COLOR_RESET << "\r\x1b[2K"; //carriage return and clear line
 
 		completion_thread.join();
@@ -229,11 +219,11 @@ void copyToClipboard(std::string textToCopy) {
 	const char* text = textToCopy.c_str();
 	const size_t len = strlen(text) + 1;
 
-	HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, len);
-	memcpy(GlobalLock(hMem), text, len);
+	// HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, len);
+	// memcpy(GlobalLock(hMem), text, len);
 
-	OpenClipboard(0);
-	EmptyClipboard();
-	SetClipboardData(CF_TEXT, hMem);
-	CloseClipboard();
+	// OpenClipboard(0);
+	// EmptyClipboard();
+	// SetClipboardData(CF_TEXT, hMem);
+	// CloseClipboard();
 }
