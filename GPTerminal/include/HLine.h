@@ -21,7 +21,7 @@ public:
 private:
 
 	std::string title;
-    const std::string hline     = "\xC4";
+    const std::string hline = "─";
 
 };
 

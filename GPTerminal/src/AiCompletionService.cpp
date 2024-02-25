@@ -51,6 +51,8 @@ auto AiCompletionService::init(char* model) -> std::optional<std::string> {
 }
 
 auto AiCompletionService::createCompletion(std::string user_input) -> Result<std::string, std::string>{
+    return Result<std::string, std::string>::Ok("This is a test"); //TODO remove for prod
+
     this->api_reply = "";
 
     auto openai_chat_api_r = this->openai_chat_api.createPrompt(user_input);

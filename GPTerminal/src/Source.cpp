@@ -21,7 +21,7 @@
 #define COLOR_MAGENTA "\033[35m"      /* Magenta */
 #define COLOR_CYAN    "\033[36m"      /* Cyan */
 #define COLOR_WHITE   "\033[37m"      /* White */
-#define COLOR_DARKGRAY   "\033[90m"      /* GRAY */
+#define COLOR_DARKGRAY "\033[90m"      /* GRAY */
 #define COLOR_BOLD	  "\033[1m"		  /* Bold */
 #define COLOR_UNDERLINE "\033[1m"		  /* Underline */
 
