@@ -1,5 +1,5 @@
 #include "TabSelector.h"
-#include <ncurses.h>
+#include <iostream>
 
 TabSelector::TabSelector(std::vector<std::string> options) {
 	this->options = options;
@@ -31,37 +31,43 @@ std::string TabSelector::draw() {
 }
 
 int TabSelector::getInput() {
-	initscr();
-	refresh();
-	int key = 0;
-	int c = getch();
 
-	if (!c || c == 224) { // check if they're extended char
+	system("stty raw");
+	char c = getchar();
 
-		switch (key = getch()) {
-		case 77: // arrow left
-			this->selectedOption = (this->selectedOption + 1) % int(this->options.size());
-			break;
-		case 75: // arrow right
-			this->selectedOption = (this->selectedOption -1) % 4;
-			if (this->selectedOption < 0) { this->selectedOption = int(this->options.size()); }
-			break;
-		}
+
+	// initscr();
+	// refresh();
+	// int key = 0;
+	// int c = getch();
+
+	// if (!c || c == 224) { // check if they're extended char
+
+	// 	switch (key = getch()) {
+	// 	case 77: // arrow left
+	// 		this->selectedOption = (this->selectedOption + 1) % int(this->options.size());
+	// 		break;
+	// 	case 75: // arrow right
+	// 		this->selectedOption = (this->selectedOption -1) % 4;
+	// 		if (this->selectedOption < 0) { this->selectedOption = int(this->options.size()); }
+	// 		break;
+	// 	}
 	
-	}
-	else {
+	// }
+	// else {
 		switch (c) {
 		case '\t':
 			this->selectedOption = (this->selectedOption + 1) % int(this->options.size());
 			break;
 		case '\r':
+			system("stty cooked");
 			return this->selectedOption;
 		}
-	}
+	// }
 
-	endwin();
+	// endwin();
 
-	//return this->selectedOption;
+	system("stty cooked");
 	return -1; // if an option has not been selected yet
 }
 

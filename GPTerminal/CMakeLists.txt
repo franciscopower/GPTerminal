@@ -14,6 +14,3 @@ add_executable(GPTerminal ${SOURCES})
 
 target_link_libraries(GPTerminal PRIVATE ${CURL_LIBRARIES})
 target_include_directories(GPTerminal PUBLIC ${CURL_INCLUDE_DIRS})
-
-target_link_libraries(GPTerminal PRIVATE ${CURSES_LIBRARIES})
-target_include_directories(GPTerminal PUBLIC ${CURSES_INCLUDE_DIRS})
