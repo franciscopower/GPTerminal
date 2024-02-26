@@ -35,37 +35,14 @@ int TabSelector::getInput() {
 	system("stty raw");
 	char c = getchar();
 
-
-	// initscr();
-	// refresh();
-	// int key = 0;
-	// int c = getch();
-
-	// if (!c || c == 224) { // check if they're extended char
-
-	// 	switch (key = getch()) {
-	// 	case 77: // arrow left
-	// 		this->selectedOption = (this->selectedOption + 1) % int(this->options.size());
-	// 		break;
-	// 	case 75: // arrow right
-	// 		this->selectedOption = (this->selectedOption -1) % 4;
-	// 		if (this->selectedOption < 0) { this->selectedOption = int(this->options.size()); }
-	// 		break;
-	// 	}
-	
-	// }
-	// else {
-		switch (c) {
-		case '\t':
-			this->selectedOption = (this->selectedOption + 1) % int(this->options.size());
-			break;
-		case '\r':
-			system("stty cooked");
-			return this->selectedOption;
-		}
-	// }
-
-	// endwin();
+	switch (c) {
+	case '\t':
+		this->selectedOption = (this->selectedOption + 1) % int(this->options.size());
+		break;
+	case '\r':
+		system("stty cooked");
+		return this->selectedOption;
+	}
 
 	system("stty cooked");
 	return -1; // if an option has not been selected yet
