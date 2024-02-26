@@ -1,0 +1,3 @@
+[submodule "GPTerminal/dependencies/clip"]
+	path = GPTerminal/dependencies/clip
+	url = https://github.com/dacap/clip.git

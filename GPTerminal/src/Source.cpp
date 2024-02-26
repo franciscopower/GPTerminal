@@ -3,6 +3,7 @@
 #include <thread>
 #include <filesystem>
 #include <optional>
+#include "clip.h"
 
 #include "Result.h"
 
@@ -216,14 +217,7 @@ std::optional<int> chat(char* model) {
 }
 
 void copyToClipboard(std::string textToCopy) {
-	const char* text = textToCopy.c_str();
-	const size_t len = strlen(text) + 1;
+	clip::set_text(textToCopy);
+	std::cout << "Copied command." << std::endl;
 
-	// HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, len);
-	// memcpy(GlobalLock(hMem), text, len);
-
-	// OpenClipboard(0);
-	// EmptyClipboard();
-	// SetClipboardData(CF_TEXT, hMem);
-	// CloseClipboard();
 }
