@@ -3,7 +3,7 @@
 #include <thread>
 #include <filesystem>
 #include <optional>
-#include "clip.h"
+#include "clip/clip.h"
 
 #include "Result.h"
 
@@ -55,6 +55,7 @@ int main(int argc, char** argv) {
 }
  
 std::optional<int> powershellHelp(std::string prompt, char* model) {
+			
 
     AiCompletionService aiService = AiCompletionService();
 	aiService.init(model);

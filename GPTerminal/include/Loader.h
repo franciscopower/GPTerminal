@@ -2,8 +2,9 @@
 
 #include <vector>
 #include <string>
-#include <thread>
-#include <chrono>
+// #include <thread>
+// #include <chrono>
+#include <unistd.h>
 
 class Loader : Component
 {
@@ -16,6 +17,7 @@ public:
 	};
 
 	Loader(Style style, std::string text) {
+		this->text = text;
 
 		switch (style)
 		{
@@ -40,7 +42,8 @@ public:
 		output.append("\r"); // carriage return
 		output.append("\x1b[2K"); //clear line
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(80));
+		// std::this_thread::sleep_for(std::chrono::milliseconds(80));
+		usleep(80);
 
 		this->index++;
 		if (this->index >= this->frames.size()) {

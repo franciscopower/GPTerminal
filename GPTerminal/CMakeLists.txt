@@ -7,7 +7,6 @@ find_package(CURL REQUIRED)
 include_directories(
     "include"
     "dependencies"
-    "dependencies/clip"
 )
 
 file(GLOB SOURCES "src/*.cpp")
