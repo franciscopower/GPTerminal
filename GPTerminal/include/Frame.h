@@ -9,10 +9,11 @@ class Frame : Component
 {
 public:
 
-	Frame(std::string content);
 	Frame();
+	Frame(std::string content);
 
 	void setContent(std::string content);
+	void setTitle(std::string title);
 
 	std::string draw();
 
