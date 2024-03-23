@@ -78,7 +78,7 @@ std::optional<int> powershellHelp(std::string prompt, char* model) {
 		"Quit"
 	};
 	TabSelector tabSelector(options);
-	Frame outputFrame("GPT");
+	Frame outputFrame("Command");
 	Loader loader(Loader::DOTS, "Generating...");
 
 	std::string fullPrompt = "Keeping in mind that the current working directory is '";
@@ -136,6 +136,7 @@ std::optional<int> powershellHelp(std::string prompt, char* model) {
 		case EXPLAIN:
 			// explain code
 			fullPrompt = "Explain the command you generated.";
+			outputFrame.setTitle("Explanation");
 			break;
 		case IMPROVE:
 			// improve
@@ -145,6 +146,7 @@ std::optional<int> powershellHelp(std::string prompt, char* model) {
 			std::cin.getline(prompt_c, 1000);
 			fullPrompt = "Change the command you created according to the following (your reply must only contain the command, nothing else): ";
 			fullPrompt.append(prompt_c);
+			outputFrame.setTitle("Command");
 			break;
 		//case RUN:
 		//	// run code

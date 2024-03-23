@@ -34,6 +34,10 @@ void Frame::setContent(std::string content) {
 	this->content = content;
 }
 
+void Frame::setTitle(std::string title) {
+	this->title = title;
+}
+
 std::string Frame::draw() {
 
 	const char border_color[] = COLOR_DARKGRAY;
