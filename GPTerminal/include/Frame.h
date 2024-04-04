@@ -22,6 +22,5 @@ private:
 	std::string content;
 	std::string title;
 
-    std::vector<std::string> split(std::string s, std::string delimiter);
 };
 

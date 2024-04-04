@@ -1,6 +1,7 @@
 #include "Frame.h"
 #include <Windows.h>
 #include <iostream>
+#include "TextManipulation.h"
 
 #define COLOR_RESET   "\033[0m"
 #define COLOR_BLACK   "\033[30m"      /* Black */
@@ -68,13 +69,13 @@ std::string Frame::draw() {
 	output.append(COLOR_RESET);
 	
 	//split string into lines
-	std::vector<std::string> contentLines = split(content, "\n");
+	std::vector<std::string> contentLines = ManipulateText::split(content, "\n");
 
 	//split lines into words
 	size_t lineLengh = 0;
 	std::vector<std::string> contentWords;
 	for (std::string l : contentLines) {
-		contentWords = split(l, " ");
+		contentWords = ManipulateText::split(l, " ");
 
 		lineLengh = 0;
 		output.append(border_color);
@@ -130,20 +131,6 @@ std::string Frame::draw() {
 	return output;
 }
 
-std::vector<std::string> Frame::split(std::string s, std::string delimiter) {
-	size_t pos_start = 0, pos_end, delim_len = delimiter.length();
-	std::string token;
-	std::vector<std::string> res;
-
-	while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
-		token = s.substr(pos_start, pos_end - pos_start);
-		pos_start = pos_end + delim_len;
-		res.push_back(token);
-	}
-
-	res.push_back(s.substr(pos_start));
-	return res;
-}
 
 
 //--------------------------

@@ -24,10 +24,12 @@
     <ClCompile Include="src\OpenAiApi.cpp" />
     <ClCompile Include="src\Source.cpp" />
     <ClCompile Include="src\TabSelector.cpp" />
+    <ClCompile Include="src\TextManipulation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dependencies\json.hpp" />
     <ClInclude Include="include\ChatApi.h" />
+    <ClInclude Include="include\TextManipulation.h" />
     <ClInclude Include="include\Frame.h" />
     <ClInclude Include="include\Component.h" />
     <ClInclude Include="include\HLine.h" />

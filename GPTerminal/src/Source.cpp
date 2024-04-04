@@ -12,11 +12,12 @@
 
 #include "Result.h"
 
-#include "Frame.h"
 #include "TabSelector.h"
 #include "Loader.h"
 #include "HLine.h"
 #include "AiCompletionService.h"
+#include "TextManipulation.h"
+#include "Frame.h"
 
 #define COLOR_RESET   "\033[0m"
 #define COLOR_BLACK   "\033[30m"      /* Black */
@@ -215,7 +216,7 @@ std::optional<int> chat(char* model) {
 			HLine hlinetitle("GPT");
 			HLine hline("");
 			std::cout << COLOR_DARKGRAY << hlinetitle.draw() << COLOR_RESET << std::endl;
-			std::cout << completion_r.value << std::endl;
+			std::cout << ManipulateText::justify(completion_r.value);
 			std::cout << COLOR_DARKGRAY << hline.draw() << std::endl << COLOR_RESET << std::endl;
 		}
 		else {
