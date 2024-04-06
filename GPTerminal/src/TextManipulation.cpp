@@ -30,7 +30,7 @@ namespace ManipulateText {
 		return res;
 	}
 
-	std::string justify(std::string text) {
+	std::string wrap(std::string text) {
 
 		std::string output = "";
 		// get window size
