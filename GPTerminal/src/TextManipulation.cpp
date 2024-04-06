@@ -8,21 +8,24 @@
 namespace ManipulateText {
 
 
-	std::vector<std::string> split(std::string s, std::string delimiter) {
+	std::vector<std::string> split(std::string &s, const std::string &delimiter) {
 		std::vector<std::string> res;
-		size_t start = 0, end = 0, delim_len = delimiter.length();
+		size_t start = 0, end = 0;
 
-		while (end < s.length()) {
-			if (s.substr(end, delim_len) == delimiter) {
-				res.push_back(s.substr(start, end-start));
-				end += delim_len;
-				start = end;
+		// handle empty delimiter (split into chars)
+		if (delimiter.empty()) {
+			for (char c : s) {
+				res.push_back(std::string(1,c));
 			}
-			else {
-				end++;
-			}
+			return res;
 		}
-		res.push_back(s.substr(start, end-start));
+
+		while ((end = s.find(delimiter, start)) != std::string::npos)
+		{
+			res.push_back(s.substr(start, end - start));
+			start = end + delimiter.length();
+		}
+		res.push_back(s.substr(start));
 
 		return res;
 	}
