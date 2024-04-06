@@ -7,11 +7,12 @@
 
 #include "Result.h"
 
-#include "Frame.h"
 #include "TabSelector.h"
 #include "Loader.h"
 #include "HLine.h"
 #include "AiCompletionService.h"
+#include "TextManipulation.h"
+#include "Frame.h"
 
 #define COLOR_RESET   "\033[0m"
 #define COLOR_BLACK   "\033[30m"      /* Black */
@@ -110,7 +111,7 @@ std::optional<int> powershellHelp(std::string prompt, char* model) {
 		// display result
 		if (completion_r.is_ok) {
 			if (selectedOption == -1 || selectedOption == IMPROVE) { generatedCommand = completion_r.value; }
-			outputFrame.setContent(completion_r.value);
+			outputFrame.setContent(ManipulateText::colorCode(completion_r.value));
 			std::cout << outputFrame.draw() << std::endl << std::endl;
 		}
 		else {
@@ -207,7 +208,7 @@ std::optional<int> chat(char* model) {
 			HLine hlinetitle("GPT");
 			HLine hline("");
 			std::cout << COLOR_DARKGRAY << hlinetitle.draw() << COLOR_RESET << std::endl;
-			std::cout << completion_r.value << std::endl;
+			std::cout << ManipulateText::wrap(ManipulateText::colorCode(completion_r.value));
 			std::cout << COLOR_DARKGRAY << hline.draw() << std::endl << COLOR_RESET << std::endl;
 		}
 		else {

@@ -52,6 +52,28 @@ auto AiCompletionService::init(char* model) -> std::optional<std::string> {
 
 auto AiCompletionService::createCompletion(std::string user_input) -> Result<std::string, std::string>{
 
+//    std::string test_reply = R"(This is a sample text string containing various elements for testing.
+//
+//* It has different sentence structures (simple, complex). Some sentences are longer, much looooonger than others, like this one, for example.
+//* It uses mixed case (uppercase and lowercase letters).
+//* Numbers are included (123, 4.56).
+//
+//Here's some inline code: `int test = 1`
+//
+//Here's some block code example too:
+//```C++
+//auto openai_chat_api_r = this->openai_chat_api.createPrompt(user_input);
+//    std::string prompt;
+//    if (openai_chat_api_r.is_ok) {
+//        prompt = openai_chat_api_r.value;
+//    } else {
+//        return Result<std::string, std::string>::Err(openai_chat_api_r.error);
+//    }
+//```
+//
+//This allows you to test your function's ability to handle a range of text features.)";
+    //return Result<std::string, std::string>::Ok(test_reply);
+
     this->api_reply = "";
 
     auto openai_chat_api_r = this->openai_chat_api.createPrompt(user_input);
