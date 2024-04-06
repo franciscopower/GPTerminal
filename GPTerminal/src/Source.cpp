@@ -117,7 +117,7 @@ std::optional<int> powershellHelp(std::string prompt, char* model) {
 		// display result
 		if (completion_r.is_ok) {
 			if (selectedOption == -1 || selectedOption == IMPROVE) { generatedCommand = completion_r.value; }
-			outputFrame.setContent(ManipulateText::colorCode(completion_r.value));
+			outputFrame.setContent(completion_r.value);
 			std::cout << outputFrame.draw() << std::endl << std::endl;
 		}
 		else {
