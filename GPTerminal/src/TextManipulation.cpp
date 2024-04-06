@@ -21,23 +21,27 @@
 namespace ManipulateText {
 
 
-	std::vector<std::string> split(std::string &s, const std::string &delimiter) {
+	// Function to split a string into substrings based on a given delimiter
+	std::vector<std::string> split(std::string& s, const std::string& delimiter) {
 		std::vector<std::string> res;
 		size_t start = 0, end = 0;
 
-		// handle empty delimiter (split into chars)
+		// Handle empty delimiter case: Split string into individual characters
 		if (delimiter.empty()) {
 			for (char c : s) {
-				res.push_back(std::string(1,c));
+				res.push_back(std::string(1, c)); 
 			}
-			return res;
+			return res; 
 		}
 
-		while ((end = s.find(delimiter, start)) != std::string::npos)
-		{
+		// Find occurrences of the delimiter and split accordingly
+		while ((end = s.find(delimiter, start)) != std::string::npos) {
+			// Extract substring from starting position to delimiter
 			res.push_back(s.substr(start, end - start));
+			// Update starting position for the next search after the delimiter
 			start = end + delimiter.length();
 		}
+		// Add the remaining part of the string (after the last delimiter or if no delimiter is found)
 		res.push_back(s.substr(start));
 
 		return res;
@@ -95,41 +99,53 @@ namespace ManipulateText {
 	}
 
 
-	std::string colorCode(std::string &text) {
+	// Function to color code text with code blocks and inline code highlighted
+	std::string colorCode(std::string& text) {
 		std::string res;
+
 		const std::string CODE_BLOCK_DELIMITER = "```";
 		const std::string CODE_LINE_DELIMITER = "`";
 
 		std::vector<std::string> sub_sections = split(text, CODE_BLOCK_DELIMITER);
+
+		// Flag to track if currently processing a code block (1) or not (0)
 		int code_block = (text.find(CODE_BLOCK_DELIMITER) == 0);
 
 		for (std::string sub : sub_sections) {
-			if (code_block == 1) { 
+
+			// Handle code blocks
+			if (code_block == 1) {
 				res.append(COLOR_YELLOW);
 				res.append(sub);
 				res.append(COLOR_RESET);
 				code_block = 0;
 			}
 			else {
+				// Handle text sections (outside code blocks)
+
 				std::vector<std::string> sub_line = split(sub, CODE_LINE_DELIMITER);
+
+				// Flag to track if currently processing an inline code section (1) or not (0)
 				int code_line = (text.find(CODE_LINE_DELIMITER) == 0);
+
+				// Loop through each sub-line within the current sub-section
 				for (std::string s : sub_line) {
+					// Handle inline code
 					if (code_line == 1) {
 						res.append(COLOR_YELLOW);
 						res.append(s);
 						res.append(COLOR_RESET);
 						code_line = 0;
-					} 
+					}
 					else {
+						// Handle normal text within a sub-section
 						res.append(s);
 						code_line = 1;
 					}
 				}
 				code_block = 1;
 			}
-			
 		}
-
 		return res;
 	}
 
