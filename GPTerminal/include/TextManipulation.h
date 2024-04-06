@@ -9,4 +9,6 @@ namespace ManipulateText {
 
 	std::string wrap(std::string text);
 
+	std::string colorCode(std::string &text);
+
 }

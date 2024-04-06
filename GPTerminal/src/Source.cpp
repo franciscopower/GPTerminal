@@ -216,7 +216,7 @@ std::optional<int> chat(char* model) {
 			HLine hlinetitle("GPT");
 			HLine hline("");
 			std::cout << COLOR_DARKGRAY << hlinetitle.draw() << COLOR_RESET << std::endl;
-			std::cout << ManipulateText::wrap(completion_r.value);
+			std::cout << ManipulateText::wrap(ManipulateText::colorCode(completion_r.value));
 			std::cout << COLOR_DARKGRAY << hline.draw() << std::endl << COLOR_RESET << std::endl;
 		}
 		else {

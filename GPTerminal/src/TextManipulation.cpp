@@ -5,6 +5,19 @@
 #include <Windows.h>
 #include <iostream> //TODO remove
 
+#define COLOR_RESET   "\033[0m"
+#define COLOR_BLACK   "\033[30m"      /* Black */
+#define COLOR_RED     "\033[31m"      /* Red */
+#define COLOR_GREEN   "\033[32m"      /* Green */
+#define COLOR_YELLOW  "\033[33m"      /* Yellow */
+#define COLOR_BLUE    "\033[34m"      /* Blue */
+#define COLOR_MAGENTA "\033[35m"      /* Magenta */
+#define COLOR_CYAN    "\033[36m"      /* Cyan */
+#define COLOR_WHITE   "\033[37m"      /* White */
+#define COLOR_DARKGRAY   "\033[90m"      /* GRAY */
+#define COLOR_BOLD	  "\033[1m"		  /* Bold */
+#define COLOR_UNDERLINE "\033[1m"		  /* Underline */
+
 namespace ManipulateText {
 
 
@@ -79,6 +92,45 @@ namespace ManipulateText {
 		}
 
 		return output;
+	}
+
+
+	std::string colorCode(std::string &text) {
+		std::string res;
+		const std::string CODE_BLOCK_DELIMITER = "```";
+		const std::string CODE_LINE_DELIMITER = "`";
+
+		std::vector<std::string> sub_sections = split(text, CODE_BLOCK_DELIMITER);
+		int code_block = (text.find(CODE_BLOCK_DELIMITER) == 0);
+
+		for (std::string sub : sub_sections) {
+			if (code_block == 1) { 
+				res.append(COLOR_YELLOW);
+				res.append(sub);
+				res.append(COLOR_RESET);
+				code_block = 0;
+			}
+			else {
+				std::vector<std::string> sub_line = split(sub, CODE_LINE_DELIMITER);
+				int code_line = (text.find(CODE_LINE_DELIMITER) == 0);
+				for (std::string s : sub_line) {
+					if (code_line == 1) {
+						res.append(COLOR_YELLOW);
+						res.append(s);
+						res.append(COLOR_RESET);
+						code_line = 0;
+					} 
+					else {
+						res.append(s);
+						code_line = 1;
+					}
+				}
+				code_block = 1;
+			}
+			
+		}
+
+		return res;
 	}
 
 }
