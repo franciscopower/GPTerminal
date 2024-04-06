@@ -2,8 +2,8 @@
 
 #include <vector>
 #include <string>
-#include <Windows.h>
-#include <iostream> //TODO remove
+#include <sys/ioctl.h>
+#include <unistd.h>
 
 #define COLOR_RESET   "\033[0m"
 #define COLOR_BLACK   "\033[30m"      /* Black */
@@ -51,12 +51,9 @@ namespace ManipulateText {
 
 		std::string output = "";
 		// get window size
-		CONSOLE_SCREEN_BUFFER_INFO csbi;
-		int winColumns, winRows;
-
-		GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
-		winColumns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-		//winRows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+		struct winsize w;
+		ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+		int winColumns = w.ws_col;
 			
 		std::vector<std::string> contentLines = split(text, "\n");
 
@@ -118,10 +115,10 @@ namespace ManipulateText {
 				size_t first_line_end = sub.find_first_of("\n");
 				std::string language = sub.substr(0, first_line_end);
 				res.append(COLOR_DARKGRAY);
-				res.append("\xC4");
+				res.append("─");
 				res.append(" " + language + " ");
 				for (int i = 0; i + language.length() + 3 < 20; i++) {
-					res.append("\xC4");
+					res.append("─");
 				}
 				res.append("\n");
 				res.append(COLOR_YELLOW);
@@ -129,7 +126,7 @@ namespace ManipulateText {
 				res.append(COLOR_RESET);
 				res.append(COLOR_DARKGRAY);
 				for (int i = 0; i < 20; i++) {
-					res.append("\xC4");
+					res.append("─");
 				}
 				res.append(COLOR_RESET);
 				code_block = 0;
