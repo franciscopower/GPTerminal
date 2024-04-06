@@ -61,13 +61,18 @@ auto AiCompletionService::createCompletion(std::string user_input) -> Result<std
 //Here's some inline code: `int test = 1`
 //
 //Here's some block code example too:
-//```python
-//def main():
-//    print("Hi mom!")
+//```C++
+//auto openai_chat_api_r = this->openai_chat_api.createPrompt(user_input);
+//    std::string prompt;
+//    if (openai_chat_api_r.is_ok) {
+//        prompt = openai_chat_api_r.value;
+//    } else {
+//        return Result<std::string, std::string>::Err(openai_chat_api_r.error);
+//    }
 //```
 //
 //This allows you to test your function's ability to handle a range of text features.)";
-//    return Result<std::string, std::string>::Ok(test_reply);
+    //return Result<std::string, std::string>::Ok(test_reply);
 
     this->api_reply = "";
 

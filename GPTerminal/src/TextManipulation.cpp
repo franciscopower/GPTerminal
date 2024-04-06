@@ -1,4 +1,4 @@
-#include "TextManipulation.h"
+﻿#include "TextManipulation.h"
 
 #include <vector>
 #include <string>
@@ -115,8 +115,22 @@ namespace ManipulateText {
 
 			// Handle code blocks
 			if (code_block == 1) {
+				size_t first_line_end = sub.find_first_of("\n");
+				std::string language = sub.substr(0, first_line_end);
+				res.append(COLOR_DARKGRAY);
+				res.append("\xC4");
+				res.append(" " + language + " ");
+				for (int i = 0; i + language.length() + 3 < 20; i++) {
+					res.append("\xC4");
+				}
+				res.append("\n");
 				res.append(COLOR_YELLOW);
-				res.append(sub);
+				res.append(sub.substr(first_line_end+1, sub.length()-2)); //append sub but removing last char, which is "\n"
+				res.append(COLOR_RESET);
+				res.append(COLOR_DARKGRAY);
+				for (int i = 0; i < 20; i++) {
+					res.append("\xC4");
+				}
 				res.append(COLOR_RESET);
 				code_block = 0;
 			}
