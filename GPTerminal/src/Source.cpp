@@ -86,6 +86,11 @@ USAGE: GPTerminal [-h | --help] [-c | --chat] <command description>
 		- Chat mode will also be entered if GPTerminal is called without providing any command.
 	- [-h | --help] - Show this help message
 
+CONFIGURATIONS: Set the following environment variables
+	- GPTERMINAL_LLM_API_KEY - Your OpenAI API key
+	- GPTERMINAL_LLM_API_HOST - (optional) The host address (url) you want to use. Defaults to the OpenAI host address.
+	- GPTERMINAL_MODEL - (optional) The OpenAI model you want to use. Defaults to gpt-3.5-turbo.
+
 If you find any issue while using GPTerminal or would like to see some extra feature, feel free to reach out here: 
 - https://github.com/franciscopower/GPTerminal/issues
 )";
