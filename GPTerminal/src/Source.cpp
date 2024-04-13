@@ -75,7 +75,26 @@ int main(int argc, char** argv) {
 	// get user input
 	std::optional<int> returned_error;
 
-	if ((argc == 2 && strcmp(argv[1],"chat") == 0) || argc < 2) {
+	if (argc == 2) {
+		if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
+			std::string help_message = R"(GPTerminal - your terminal AI assistant
+
+USAGE: GPTerminal [-h | --help] [-c | --chat] <command description>
+	- <command description> - Generate a command based on the provided description.
+		- eg.: GPTerminal list all markdown files in current directory
+	- [-c | --chat] - Enter chat mode
+		- Chat mode will also be entered if GPTerminal is called without providing any command.
+	- [-h | --help] - Show this help message
+
+If you find any issue while using GPTerminal or would like to see some extra feature, feel free to reach out here: 
+- https://github.com/franciscopower/GPTerminal/issues
+)";
+			std::cout << help_message << std::endl;
+			return 0;
+		}
+	}
+
+	if ((argc == 2 && (strcmp(argv[1],"--chat") == 0 || strcmp(argv[1],"-c") == 0 )) || argc < 2) {
 		returned_error = chat(model, host, apiKey);
 	} 
 	else {
