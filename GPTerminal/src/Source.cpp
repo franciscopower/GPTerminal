@@ -32,16 +32,51 @@
 #define COLOR_BOLD	  "\033[1m"		  /* Bold */
 #define COLOR_UNDERLINE "\033[1m"		  /* Underline */
 
-std::optional<int> chat(char* model);
-std::optional<int> powershellHelp(std::string prompt, char* model);
+#define ENV_VAR_MAX_SIZE 200
+#define ERROR_MESSAGE_MAX_SIZE 100
+
+std::optional<int> chat(char* model, char* host, char* apiKey);
+std::optional<int> powershellHelp(std::string prompt, char* model, char* host, char* apiKey);
 void copyToClipboard(std::string textToCopy);
+void getEnvVariable(const char* envVarName, char* destination, char* error);
 
 int main(int argc, char** argv) {
-    char model[] = "gpt-3.5-turbo";
+
+	//get settings
+	char model[ENV_VAR_MAX_SIZE] = "";
+	char host[ENV_VAR_MAX_SIZE] = "";
+	char apiKey[ENV_VAR_MAX_SIZE] = "";
+
+	const char ENV_LLM_API_KEY[] = "GPTERMINAL_LLM_API_KEY";
+	const char ENV_OPENAI_API_KEY[] = "OPENAI_API_KEY";
+	const char ENV_LLM_API_HOST[] = "GPTERMINAL_LLM_API_HOST";
+	const char ENV_LLM_MODEL[] = "GPTERMINAL_MODEL";
+
+	char err_llmKey[ERROR_MESSAGE_MAX_SIZE];
+	char err_openaiKey[ERROR_MESSAGE_MAX_SIZE];
+	getEnvVariable(ENV_LLM_API_KEY, apiKey, err_llmKey);
+	getEnvVariable(ENV_OPENAI_API_KEY, apiKey, err_openaiKey);
+	if (apiKey[0] == '\0') {
+		std::cout << COLOR_RED << "[ERROR] - Could not find Api Key.\nPlease set an environment variable called GPTERMINAL_LLM_API_KEY to your api key." << COLOR_RESET << std::endl;
+		return 1;
+	}
+
+	char error[ERROR_MESSAGE_MAX_SIZE];
+	getEnvVariable(ENV_LLM_API_HOST, host, error);
+	getEnvVariable(ENV_LLM_MODEL, model, error);
+	if (host[0] == '\0') {
+		strcpy_s(host, ENV_VAR_MAX_SIZE, "https://api.openai.com/v1/chat/completions");
+	}
+	if (model[0] == '\0') {
+		strcpy_s(model, ENV_VAR_MAX_SIZE, "gpt-3.5-turbo");
+	}
+
+
+	// get user input
 	std::optional<int> returned_error;
 
 	if ((argc == 2 && strcmp(argv[1],"chat") == 0) || argc < 2) {
-		returned_error = chat(model);
+		returned_error = chat(model, host, apiKey);
 	} 
 	else {
 		std::string prompt = "";
@@ -49,7 +84,7 @@ int main(int argc, char** argv) {
 			prompt.append(argv[i]);
 			prompt.append(" ");
 		}
-		returned_error = powershellHelp(prompt, model);
+		returned_error = powershellHelp(prompt, model, host, apiKey);
 	}
 	
 	std::cout << COLOR_RESET;
@@ -60,10 +95,10 @@ int main(int argc, char** argv) {
 		return 0;
 }
  
-std::optional<int> powershellHelp(std::string prompt, char* model) {
+std::optional<int> powershellHelp(std::string prompt, char* model, char* host, char* apiKey) {
 
     AiCompletionService aiService = AiCompletionService();
-	aiService.init(model);
+	aiService.init(model, host, apiKey);
 
 	bool responseComplete = false;
 
@@ -172,14 +207,14 @@ std::optional<int> powershellHelp(std::string prompt, char* model) {
 }
 
 
-std::optional<int> chat(char* model) {
+std::optional<int> chat(char* model, char* host, char* apiKey) {
 
 	Loader loader(Loader::DOTS, "Generating...");
     AiCompletionService aiService = AiCompletionService();
 
-	std::cout << "Let's chat! And when you want to quit, just type 'quit' or 'q' :)" << std::endl;
+	std::cout << "Hi! I'm " << model << ". Let's chat! And when you want to quit, just type 'quit' or 'q' :)" << std::endl;
 
-	std::optional<std::string> ai_init_error = aiService.init(model);
+	std::optional<std::string> ai_init_error = aiService.init(model, host, apiKey);
 	if (ai_init_error.has_value()) {
 		std::cerr << COLOR_RED << "[ERROR] - " << ai_init_error.value() << COLOR_RESET << std::endl;
 		return 1;
@@ -241,4 +276,24 @@ void copyToClipboard(std::string textToCopy) {
 	CloseClipboard();
 
 	std::cout << "Copied command." << std::endl;
+}
+
+void getEnvVariable(const char* envVarName, char* destination, char* error) {
+
+	char envVarValue[ENV_VAR_MAX_SIZE];
+	
+	size_t sz = 0;
+	char* rawEnvVarValue = nullptr;
+	errno_t resEnv = _dupenv_s(&rawEnvVarValue, &sz, envVarName);
+	if (resEnv != 0 || rawEnvVarValue == nullptr) {
+		free(rawEnvVarValue);
+		strncpy(error, "Could not find environemnt variable " , ERROR_MESSAGE_MAX_SIZE);
+		strncat(error, envVarName, ERROR_MESSAGE_MAX_SIZE-40);
+		return;
+	}
+	strncpy(destination, rawEnvVarValue, ENV_VAR_MAX_SIZE);
+	free(rawEnvVarValue);
+
+	return;
+
 }

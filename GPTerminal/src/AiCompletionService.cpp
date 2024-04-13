@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <iostream>
+#include <stdio.h>
 
 #include <optional>
 #include "Result.h"
@@ -10,17 +11,24 @@
 
 AiCompletionService::AiCompletionService() {}
 
-auto AiCompletionService::init(char* model) -> std::optional<std::string> {
+auto AiCompletionService::init(char* model, char* host, char* apiKey) -> std::optional<std::string> { 
+
+    this->openai_chat_api = OpenAiApi(model);
+
+    //check what provider the model is from
+    int bValidModel = 0;
+    for (const char* m : this->openai_chat_api.MODELS_LIST) {
+        if (strcmp(m, model) == 0) {
+            bValidModel = 1;
+            exit;
+        }
+    }
+    if (bValidModel == 0) {
+        return "The selected LLM is not supported by GPTerminal. Try setting a different one.\nFor more information, check the help (-h or --help) section";
+    }
 
     this->openai_chat_api = OpenAiApi(model);
     
-    ServiceHeaders* service_headers;
-    auto service_headers_r = this->openai_chat_api.setServiceHeaders();
-    if (service_headers_r.is_ok)
-        service_headers = service_headers_r.value;
-    else
-        return service_headers_r.error;
-
     // CURL initialization
     curl_global_init(CURL_GLOBAL_ALL);
     this->curl = curl_easy_init();
@@ -32,14 +40,14 @@ auto AiCompletionService::init(char* model) -> std::optional<std::string> {
     struct curl_slist* headers = NULL;
 
     char curlBearerHeader[BEARER_TOKEN_MAX_SIZE] = "Authorization: Bearer ";
-    strncat_s(curlBearerHeader, BEARER_TOKEN_MAX_SIZE, service_headers->bearer_token, BEARER_TOKEN_MAX_SIZE - 25);
+    strncat_s(curlBearerHeader, BEARER_TOKEN_MAX_SIZE, apiKey, BEARER_TOKEN_MAX_SIZE - 25);
 
     headers = curl_slist_append(headers, curlBearerHeader);
     headers = curl_slist_append(headers, "Content-Type: application/json");
     headers = curl_slist_append(headers, "Accept: application/json");
 
     // set CURL options
-    curl_easy_setopt(this->curl, CURLOPT_URL, service_headers->url);
+    curl_easy_setopt(this->curl, CURLOPT_URL, host);
     curl_easy_setopt(this->curl, CURLOPT_CUSTOMREQUEST, "POST");
     curl_easy_setopt(this->curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(this->curl, CURLOPT_DEFAULT_PROTOCOL, "https");
