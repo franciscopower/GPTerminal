@@ -10,7 +10,7 @@ public:
 	~AiCompletionService();
 
 	Result<std::string, std::string> createCompletion(std::string user_input);
-	std::optional<std::string> init(char* model);
+	std::optional<std::string> init(char* model, char* host, char* apiKey);
 
 private:
 
@@ -20,6 +20,6 @@ private:
 	std::string api_reply;
 
     CURL* curl;
-    CURLcode res;
+	CURLcode res;
 };
 
