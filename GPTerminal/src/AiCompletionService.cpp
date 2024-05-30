@@ -110,9 +110,11 @@ auto AiCompletionService::createCompletion(std::string user_input) -> Result<std
 }
 
 size_t AiCompletionService::decodeCompletion(char* data, size_t size, size_t nmemb, void* userdata) {
-    ((std::string*)userdata)->append(std::string(data));
+    size_t result_size = size * nmemb;
 
-    return size * nmemb;
+    ((std::string*)userdata)->append(data, result_size);
+
+    return result_size;
 }
 
 AiCompletionService::~AiCompletionService()
