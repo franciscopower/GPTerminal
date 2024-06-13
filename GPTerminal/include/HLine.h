@@ -19,7 +19,7 @@ public:
 private:
 
 	std::string title;
-    const std::string hline     = "\xC4";
+    const std::string hline     = u8"\u2500";
 
 };
 
@@ -42,7 +42,7 @@ void HLine::setTitle(std::string title) {
 }
 
 std::string HLine::draw() {
-	std::string output;
+	std::string output = u8"";
 
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
 	int winColumns;

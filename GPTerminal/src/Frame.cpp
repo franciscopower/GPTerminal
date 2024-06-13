@@ -16,12 +16,12 @@
 #define COLOR_BOLD	  "\033[1m"		  /* Bold */
 #define COLOR_UNDERLINE "\033[1m"		  /* Underline */
 
-#define HLINE     "\xC4"
-#define VLINE     "\xB3"
-#define ULCORNER  "\xDA"
-#define URCORNER  "\xBF"
-#define LRCORNER  "\xD9"
-#define LLCORNER  "\xC0"
+#define HLINE     u8"\u2500"
+#define VLINE     u8"\u2502"
+#define ULCORNER  u8"\u250c"
+#define URCORNER  u8"\u2510"
+#define LRCORNER  u8"\u2518"
+#define LLCORNER  u8"\u2514"
 
 Frame::Frame(std::string title) {
 	this->title = title;

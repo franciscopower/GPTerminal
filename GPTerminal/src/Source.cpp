@@ -4,10 +4,6 @@
 #include <thread>
 #include <filesystem>
 
-#include <fcntl.h> // for _setmode
-#include <io.h> // for _setmode
-#include <stdio.h> // for _fileno
-
 #include <optional>
 
 #include "Result.h"
@@ -71,6 +67,10 @@ int main(int argc, char** argv) {
 		strcpy_s(model, ENV_VAR_MAX_SIZE, "gpt-3.5-turbo");
 	}
 
+	// Set console code page to UTF-8 so console known how to interpret string data
+	SetConsoleOutputCP(CP_UTF8);
+	// Enable buffering to prevent VS from chopping up UTF-8 byte sequences
+	setvbuf(stdout, nullptr, _IOFBF, 1000);
 
 	// get user input
 	std::optional<int> returned_error;
@@ -164,11 +164,9 @@ std::optional<int> powershellHelp(std::string prompt, char* model, char* host, c
 
 		// loader animation
 		std::cout << COLOR_YELLOW;
-		_setmode(_fileno(stdout), _O_U8TEXT);
 		while (completion_r.value == "" && completion_r.error == "") {
-			std::wcout << loader.wdraw();
+			std::cout << loader.draw() << std::flush;
 		}
-		_setmode(_fileno(stdout), _O_TEXT);
 		std::cout << COLOR_RESET << "\r\x1b[2K"; //carriage return and clear line
 
 		completion_thread.join();
@@ -187,7 +185,7 @@ std::optional<int> powershellHelp(std::string prompt, char* model, char* host, c
 		// get next action 
 		selectedOption = -1;
 		while (selectedOption < 0 ) {
-			std::cout << tabSelector.draw();
+			std::cout << tabSelector.draw() << std::flush;
 			selectedOption = tabSelector.getInput();
 		}
 		std::cout << std::endl << std::endl;
@@ -246,6 +244,8 @@ std::optional<int> chat(char* model, char* host, char* apiKey) {
 
 
 	while (true) {
+			
+		
 
 		std::cout << COLOR_DARKGRAY << "You: " << COLOR_RESET;
 		char prompt_c[1000];
@@ -262,11 +262,9 @@ std::optional<int> chat(char* model, char* host, char* apiKey) {
 
 		// loader animation
 		std::cout << COLOR_YELLOW;
-		_setmode(_fileno(stdout), _O_U8TEXT);
 		while (completion_r.value == "" && completion_r.error == "") {
-			std::wcout << loader.wdraw();
+			std::cout << loader.draw() << std::flush; //TODO make it work without the endl
 		}
-		_setmode(_fileno(stdout), _O_TEXT);
 		std::cout << COLOR_RESET << "\r\x1b[2K"; //carriage return and clear line
 
 		completion_thread.join();
@@ -304,8 +302,6 @@ void copyToClipboard(std::string textToCopy) {
 
 void getEnvVariable(const char* envVarName, char* destination, char* error) {
 
-	char envVarValue[ENV_VAR_MAX_SIZE];
-	
 	size_t sz = 0;
 	char* rawEnvVarValue = nullptr;
 	errno_t resEnv = _dupenv_s(&rawEnvVarValue, &sz, envVarName);
