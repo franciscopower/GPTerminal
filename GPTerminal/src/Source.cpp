@@ -1,4 +1,5 @@
-﻿#include <iostream>
+﻿#include <memory>
+#include <iostream>
 #include <windows.h>
 #include <vector>
 #include <thread>
@@ -12,6 +13,7 @@
 #include "Loader.h"
 #include "HLine.h"
 #include "AiCompletionService.h"
+#include "OpenAiApi.h"
 #include "TextManipulation.h"
 #include "Frame.h"
 
@@ -124,7 +126,9 @@ If you find any issue while using GPTerminal or would like to see some extra fea
  
 std::optional<int> powershellHelp(std::string prompt, char* model, char* host, char* apiKey) {
 
-    AiCompletionService aiService = AiCompletionService();
+	auto openai_service = std::make_shared<OpenAiApi>();
+    AiCompletionService aiService = AiCompletionService(openai_service);
+
 	aiService.init(model, host, apiKey);
 
 	bool responseComplete = false;
@@ -235,7 +239,8 @@ std::optional<int> powershellHelp(std::string prompt, char* model, char* host, c
 std::optional<int> chat(char* model, char* host, char* apiKey) {
 
 	Loader loader(Loader::DOTS, "Generating...");
-    AiCompletionService aiService = AiCompletionService();
+	auto openai_service = std::make_shared<OpenAiApi>();
+    AiCompletionService aiService = AiCompletionService(openai_service);
 
 	std::cout << "Hi! I'm " << model << ". Let's chat! And when you want to quit, just type 'quit' or 'q' :)" << std::endl;
 
@@ -245,10 +250,7 @@ std::optional<int> chat(char* model, char* host, char* apiKey) {
 		return 1;
 	}
 
-
 	while (true) {
-			
-		
 
 		std::cout << COLOR_DARKGRAY << "You: " << COLOR_RESET;
 		char prompt_c[1000];

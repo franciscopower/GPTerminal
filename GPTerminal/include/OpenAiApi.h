@@ -1,23 +1,26 @@
 #pragma once
-#include <optional>
-
 #include "ChatApi.h"
 #include "Result.h"
+#include "curl/curl.h"
 
 class OpenAiApi : public ChatApi
 {
 public:
-	OpenAiApi(char* model);
 	OpenAiApi();
 	~OpenAiApi();
-	Result<std::string, std::string> createPrompt(std::string user_input);
-	Result<std::string, std::string> decodeReply(std::string api_reply);
 
-	const char* MODELS_LIST[4] = {
-      "gpt-4o",
-      "gpt-4",
-      "gpt-4-turbo",
-      "gpt-3.5-turbo",
-	};
+	std::optional<std::string> init(char* model, char* host, char* apiKey) override;
+	virtual Result<std::string, std::string> requestCompletion(std::string user_input) override;
+
+private:
+
+	Result<std::string, std::string> createPrompt(std::string user_input) override;
+	static size_t curlWriteFunction(char* data, size_t size, size_t nmemb, void* userdata);
+	Result<std::string, std::string> parseReply(std::string api_reply) override;
+
+	std::string api_reply;
+
+    CURL* curl;
+	CURLcode res;
 
 };

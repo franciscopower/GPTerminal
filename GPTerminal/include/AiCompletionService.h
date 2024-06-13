@@ -1,25 +1,24 @@
 #pragma once
-#include <curl/curl.h>
+#include <memory>
 #include <optional>
-#include "OpenAiApi.h"
+#include "ChatApi.h"
+
 
 class AiCompletionService
 {
 public:
-	AiCompletionService();
+	AiCompletionService(std::shared_ptr<ChatApi> chat_api_service);
 	~AiCompletionService();
 
 	Result<std::string, std::string> createCompletion(std::string user_input);
 	std::optional<std::string> init(char* model, char* host, char* apiKey);
 
 private:
-
-	static size_t decodeCompletion(char* data, size_t size, size_t nmemb, void* userdata);
-	OpenAiApi openai_chat_api;
-
-	std::string api_reply;
-
-    CURL* curl;
-	CURLcode res;
+	std::shared_ptr<ChatApi> chat_api;
 };
 
+//class AiCompletionServiceFactory
+//{
+//public:
+//	ChatApi* getService(std::string model);
+//};
