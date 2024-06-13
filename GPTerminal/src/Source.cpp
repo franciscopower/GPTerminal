@@ -68,6 +68,7 @@ int main(int argc, char** argv) {
 	}
 
 	// Set console code page to UTF-8 so console known how to interpret string data
+	UINT oldcp = GetConsoleOutputCP();  //what is the current code page? store for later
 	SetConsoleOutputCP(CP_UTF8);
 	// Enable buffering to prevent VS from chopping up UTF-8 byte sequences
 	setvbuf(stdout, nullptr, _IOFBF, 1000);
@@ -95,6 +96,7 @@ If you find any issue while using GPTerminal or would like to see some extra fea
 - https://github.com/franciscopower/GPTerminal/issues
 )";
 			std::cout << help_message << std::endl;
+			SetConsoleOutputCP(oldcp);
 			return 0;
 		}
 	}
@@ -113,6 +115,7 @@ If you find any issue while using GPTerminal or would like to see some extra fea
 	
 	std::cout << COLOR_RESET;
 
+	SetConsoleOutputCP(oldcp);
 	if (returned_error.has_value())
 		return 1;
 	else
@@ -205,7 +208,7 @@ std::optional<int> powershellHelp(std::string prompt, char* model, char* host, c
 		case IMPROVE:
 			// improve
 			std::cout << "How should I improve the command?" << std::endl;
-			std::cout << COLOR_YELLOW << "-> " << COLOR_RESET;
+			std::cout << COLOR_YELLOW << u8"\u21aa " << COLOR_RESET;
 			char prompt_c[1000];
 			std::cin.getline(prompt_c, 1000);
 			fullPrompt = "Change the command you created according to the following (your reply must only contain the command, nothing else): ";
