@@ -40,7 +40,7 @@ std::shared_ptr<ChatApi> AiCompletionServiceFactory::getService(std::string mode
 		}
 	}
 	
-	if (selected_service == "open_ai") {
+	if (selected_service == "open_ai" || model == "") {
 		auto openai_service = std::make_shared<OpenAiApi>();
 		return openai_service;
 	}
