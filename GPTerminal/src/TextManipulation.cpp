@@ -163,4 +163,17 @@ namespace ManipulateText {
 		return res;
 	}
 
+
+	std::string removeCodeBlocks(std::string& text) {
+		std::string result = text;
+		if (result[0] == '`') {
+			result.erase(0, 1);
+		}
+		if (result[result.size()-1] == '`') {
+			result.pop_back();
+		}
+
+		return result;
+	}
+
 }

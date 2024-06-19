@@ -114,7 +114,7 @@ If you find any issue while using GPTerminal or would like to see some extra fea
 		}
 		returned_error = powershellHelp(prompt, model, host, apiKey);
 	}
-	
+		
 	std::cout << COLOR_RESET;
 
 	SetConsoleOutputCP(oldcp);
@@ -143,14 +143,14 @@ std::optional<int> powershellHelp(std::string prompt, char* model, char* host, c
 		COPY,
 		EXPLAIN,
 		IMPROVE,
-		//RUN,
+		RUN,
 		QUIT
 	};
 	std::vector<std::string> options = {
 		"Copy to Clipboard",
 		"Explain",
 		"Improve",
-		//"Run",
+		"Run",
 		"Quit"
 	};
 	TabSelector tabSelector(options);
@@ -184,15 +184,17 @@ std::optional<int> powershellHelp(std::string prompt, char* model, char* host, c
 		completion_thread.join();
 
 		// display result
-		if (completion_r.is_ok) {
-			if (selectedOption == -1 || selectedOption == IMPROVE) { generatedCommand = completion_r.value; }
-			outputFrame.setContent(completion_r.value);
-			std::cout << outputFrame.draw() << std::endl << std::endl;
-		}
-		else {
+		if (!completion_r.is_ok) {
 			std::cerr << COLOR_RED << "[ERROR] - " << completion_r.error << COLOR_RESET << std::endl;
 			return 1;
 		}
+
+		if (selectedOption == -1 || selectedOption == IMPROVE) { 
+			generatedCommand = completion_r.value; 
+			generatedCommand = ManipulateText::removeCodeBlocks(generatedCommand);
+		}
+		outputFrame.setContent(completion_r.value);
+		std::cout << outputFrame.draw() << std::endl << std::endl;
 
 		// get next action 
 		selectedOption = -1;
@@ -201,6 +203,9 @@ std::optional<int> powershellHelp(std::string prompt, char* model, char* host, c
 			selectedOption = tabSelector.getInput();
 		}
 		std::cout << std::endl << std::endl;
+
+		std::string full_command = "powershell ";
+		full_command.append(generatedCommand);
 
 		switch (selectedOption)
 		{
@@ -224,11 +229,11 @@ std::optional<int> powershellHelp(std::string prompt, char* model, char* host, c
 			fullPrompt.append(prompt_c);
 			outputFrame.setTitle("Command");
 			break;
-		//case RUN:
-		//	// run code
-		//	system(completion.c_str());
-		//	responseComplete = true;
-		//	break;
+		case RUN:
+			// run code
+			system(full_command.c_str());
+			responseComplete = true;
+			break;
 		case QUIT:
 			responseComplete = true;
 			break;

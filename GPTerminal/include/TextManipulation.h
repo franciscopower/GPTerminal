@@ -11,4 +11,6 @@ namespace ManipulateText {
 
 	std::string colorCode(std::string &text);
 
+	std::string removeCodeBlocks(std::string& text);
+
 }
