@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="src\Frame.cpp" />
     <ClCompile Include="src\AiCompletionService.cpp" />
+    <ClCompile Include="src\GeminiApi.cpp" />
     <ClCompile Include="src\OpenAiApi.cpp" />
     <ClCompile Include="src\Source.cpp" />
     <ClCompile Include="src\TabSelector.cpp" />
@@ -29,6 +30,7 @@
   <ItemGroup>
     <ClInclude Include="dependencies\json.hpp" />
     <ClInclude Include="include\ChatApi.h" />
+    <ClInclude Include="include\GeminiApi.h" />
     <ClInclude Include="include\TextManipulation.h" />
     <ClInclude Include="include\Frame.h" />
     <ClInclude Include="include\Component.h" />

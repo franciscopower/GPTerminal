@@ -13,11 +13,17 @@ public:
 	virtual std::optional<std::string> init(char* model, char* host, char* apiKey) = 0;
 	virtual Result<std::string, std::string> requestCompletion(std::string user_input) = 0;
 
-	const char* MODELS_LIST[4] = {
+	const char* OPENAI_MODELS_LIST[4] = {
       "gpt-4o",
       "gpt-4",
       "gpt-4-turbo",
       "gpt-3.5-turbo",
+	};
+
+	const char* GEMINI_MODELS_LIST[3] = {
+      "gemini-1.5-pro",
+      "gemini-1.5-flash",
+      "gemini-1.0-pro",
 	};
 
 protected:

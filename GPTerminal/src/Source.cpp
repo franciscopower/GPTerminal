@@ -14,6 +14,7 @@
 #include "HLine.h"
 #include "AiCompletionService.h"
 #include "OpenAiApi.h"
+#include "GeminiApi.h"
 #include "TextManipulation.h"
 #include "Frame.h"
 
@@ -63,10 +64,12 @@ int main(int argc, char** argv) {
 	getEnvVariable(ENV_LLM_API_HOST, host, error);
 	getEnvVariable(ENV_LLM_MODEL, model, error);
 	if (host[0] == '\0') {
-		strcpy_s(host, ENV_VAR_MAX_SIZE, "https://api.openai.com/v1/chat/completions");
+		//strcpy_s(host, ENV_VAR_MAX_SIZE, "https://api.openai.com/v1/chat/completions");
+		strcpy_s(host, ENV_VAR_MAX_SIZE, "https://generativelanguage.googleapis.com/v1");
 	}
 	if (model[0] == '\0') {
-		strcpy_s(model, ENV_VAR_MAX_SIZE, "gpt-3.5-turbo");
+		//strcpy_s(model, ENV_VAR_MAX_SIZE, "gpt-3.5-turbo");
+		strcpy_s(model, ENV_VAR_MAX_SIZE, "gemini-1.5-flash");
 	}
 
 	// Set console code page to UTF-8 so console known how to interpret string data
@@ -126,8 +129,9 @@ If you find any issue while using GPTerminal or would like to see some extra fea
  
 std::optional<int> powershellHelp(std::string prompt, char* model, char* host, char* apiKey) {
 
-	auto openai_service = std::make_shared<OpenAiApi>();
-    AiCompletionService aiService = AiCompletionService(openai_service);
+	//auto openai_service = std::make_shared<OpenAiApi>();
+	auto gemini_service = std::make_shared<GeminiApi>();
+    AiCompletionService aiService = AiCompletionService(gemini_service);
 
 	aiService.init(model, host, apiKey);
 
@@ -239,8 +243,10 @@ std::optional<int> powershellHelp(std::string prompt, char* model, char* host, c
 std::optional<int> chat(char* model, char* host, char* apiKey) {
 
 	Loader loader(Loader::DOTS, "Generating...");
-	auto openai_service = std::make_shared<OpenAiApi>();
-    AiCompletionService aiService = AiCompletionService(openai_service);
+
+	//auto openai_service = std::make_shared<OpenAiApi>();
+	auto gemini_service = std::make_shared<GeminiApi>();
+    AiCompletionService aiService = AiCompletionService(gemini_service);
 
 	std::cout << "Hi! I'm " << model << ". Let's chat! And when you want to quit, just type 'quit' or 'q' :)" << std::endl;
 
