@@ -36,6 +36,7 @@ public:
 
 	};
 
+
 	std::string draw() {
 		std::string output = "";
 
@@ -98,7 +99,7 @@ private:
 //---------------------------------------------
 //void exampleUse{
 //
-//	Loader loader(Loader::BALL, "Loading...");
+//	u8oader loader(Loader::BALL, "Loading...");
 //
 //	while (RESULT == false) {
 //		std::cout << loader.draw();

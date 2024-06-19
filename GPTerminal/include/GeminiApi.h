@@ -3,11 +3,11 @@
 #include "Result.h"
 #include "curl/curl.h"
 
-class OpenAiApi : public ChatApi
+class GeminiApi : public ChatApi
 {
 public:
-	OpenAiApi();
-	~OpenAiApi();
+	GeminiApi();
+	~GeminiApi();
 
 	std::optional<std::string> init(char* model, char* host, char* apiKey) override;
 	Result<std::string, std::string> requestCompletion(std::string user_input) override;
@@ -15,6 +15,7 @@ public:
 	std::string getModel() override {
 		return this->model;
 	}
+
 
 private:
 

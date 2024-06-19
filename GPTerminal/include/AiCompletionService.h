@@ -1,25 +1,43 @@
 #pragma once
-#include <curl/curl.h>
+#include <memory>
 #include <optional>
-#include "OpenAiApi.h"
+#include "ChatApi.h"
+#include <unordered_map>
+
 
 class AiCompletionService
 {
 public:
-	AiCompletionService();
+	AiCompletionService(std::shared_ptr<ChatApi> chat_api_service);
 	~AiCompletionService();
 
 	Result<std::string, std::string> createCompletion(std::string user_input);
 	std::optional<std::string> init(char* model, char* host, char* apiKey);
+	std::string getModel();
 
 private:
-
-	static size_t decodeCompletion(char* data, size_t size, size_t nmemb, void* userdata);
-	OpenAiApi openai_chat_api;
-
-	std::string api_reply;
-
-    CURL* curl;
-	CURLcode res;
+	std::shared_ptr<ChatApi> chat_api;
 };
 
+class AiCompletionServiceFactory
+{
+public:
+	std::shared_ptr<ChatApi> getService(std::string model);
+
+	const std::unordered_map<std::string, std::vector<std::string>> models = {
+		{"open_ai", {
+			  "gpt-4o",
+			  "gpt-4",
+			  "gpt-4-turbo",
+			  "gpt-3.5-turbo",
+			}
+		},
+		{"gemini", {
+			  "gemini-1.5-pro",
+			  "gemini-1.5-flash",
+			  "gemini-1.0-pro",
+			}
+		}
+	};
+
+};

@@ -44,7 +44,7 @@ void HLine::setTitle(std::string title) {
 }
 
 std::string HLine::draw() {
-	std::string output;
+	std::string output = u8"";
 
 	struct winsize w;
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
