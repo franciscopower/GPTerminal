@@ -41,6 +41,32 @@ void getEnvVariable(const char* envVarName, char* destination, char* error);
 
 int main(int argc, char** argv) {
 
+	// help section
+	if (argc == 2) {
+		if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
+			std::string help_message = R"(GPTerminal - your terminal AI assistant
+
+USAGE: GPTerminal [-h | --help] [-c | --chat] <command description>
+	- <command description> - Generate a command based on the provided description.
+		- eg.: GPTerminal list all markdown files in current directory
+	- [-c | --chat] - Enter chat mode
+		- Chat mode will also be entered if GPTerminal is called without providing any command.
+	- [-h | --help] - Show this help message
+
+CONFIGURATIONS: Set the following environment variables
+	- GPTERMINAL_LLM_API_KEY - Your API key (for OpenAI API or for the Google Gemini API)
+	- GPTERMINAL_LLM_API_HOST - (optional) The host address (url) you want to use. Defaults to the OpenAI host address.
+	- GPTERMINAL_MODEL - (optional) The LLM model you want to use. Defaults to gpt-3.5-turbo.
+	- GPTERMINAL_CHAT_MODEL - (optional) The LLM model you want to use in chat mode. Defaults to the same model you choose in the GPTERMINAL_MODEL environment variable.
+
+If you find any issue while using GPTerminal or would like to see some extra feature, feel free to reach out here: 
+- https://github.com/franciscopower/GPTerminal/issues
+)";
+			std::cout << help_message << std::endl;
+			return 0;
+		}
+	}
+
 	//get settings
 	char model[ENV_VAR_MAX_SIZE] = "";
 	char model_chat[ENV_VAR_MAX_SIZE] = "";
@@ -65,7 +91,7 @@ int main(int argc, char** argv) {
 	char error[ERROR_MESSAGE_MAX_SIZE];
 	getEnvVariable(ENV_LLM_API_HOST, host, error);
 	getEnvVariable(ENV_LLM_MODEL, model, error);
-	getEnvVariable(ENV_LLM_MODEL, model_chat, error);
+	getEnvVariable(ENV_LLM_MODEL_CHAT, model_chat, error);
 	if (model_chat[0] == '\0') {
 		strncpy(model_chat, model, ENV_VAR_MAX_SIZE);
 	}
@@ -79,33 +105,6 @@ int main(int argc, char** argv) {
 
 	// get user input
 	std::optional<int> returned_error;
-
-	if (argc == 2) {
-		if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
-			std::string help_message = R"(GPTerminal - your terminal AI assistant
-
-USAGE: GPTerminal [-h | --help] [-c | --chat] <command description>
-	- <command description> - Generate a command based on the provided description.
-		- eg.: GPTerminal list all markdown files in current directory
-	- [-c | --chat] - Enter chat mode
-		- Chat mode will also be entered if GPTerminal is called without providing any command.
-	- [-h | --help] - Show this help message
-
-CONFIGURATIONS: Set the following environment variables
-	- GPTERMINAL_LLM_API_KEY - Your API key (for OpenAI API or for the Google Gemini API)
-	- GPTERMINAL_LLM_API_HOST - (optional) The host address (url) you want to use. Defaults to the OpenAI host address.
-	- GPTERMINAL_MODEL - (optional) The LLM model you want to use. Defaults to gpt-3.5-turbo.
-	- GPTERMINAL_CHAT_MODEL - (optional) The LLM model you want to use in chat mode. Defaults to the same model you choose in the GPTERMINAL_MODEL environment variable.
-
-If you find any issue while using GPTerminal or would like to see some extra feature, feel free to reach out here: 
-- https://github.com/franciscopower/GPTerminal/issues
-)";
-			std::cout << help_message << std::endl;
-			SetConsoleOutputCP(oldcp);
-			return 0;
-		}
-	}
-
 	if ((argc == 2 && (strcmp(argv[1],"--chat") == 0 || strcmp(argv[1],"-c") == 0 )) || argc < 2) {
 		returned_error = chat(model_chat, host, apiKey);
 	} 
@@ -129,9 +128,13 @@ If you find any issue while using GPTerminal or would like to see some extra fea
  
 std::optional<int> powershellHelp(std::string prompt, char* model, char* host, char* apiKey) {
 
-	//auto openai_service = std::make_shared<OpenAiApi>();
-	auto gemini_service = std::make_shared<GeminiApi>();
-    AiCompletionService aiService = AiCompletionService(gemini_service);
+	AiCompletionServiceFactory llm_service_factory;
+	auto llm_service = llm_service_factory.getService(model);
+	if (llm_service == NULL) {
+		std::cerr << COLOR_RED << "[ERROR] - " << model << " is currently not supported by GPTerminal. Change the defined model in the environment variable GPTERMINAL_MODEL." << COLOR_RESET << std::endl;
+		return 1;
+	}
+    AiCompletionService aiService = AiCompletionService(llm_service);
 
 	aiService.init(model, host, apiKey);
 
@@ -158,7 +161,7 @@ std::optional<int> powershellHelp(std::string prompt, char* model, char* host, c
 
 	std::string fullPrompt = "Keeping in mind that the current working directory is '";
 	fullPrompt.append(std::filesystem::current_path().string());
-	fullPrompt.append("', given the following request, create a Windows Powershell command that can solve it (your reply must only contain the command, nothing else. For example: Request: 'List all items in the current directory'; Reply: 'Get-ChildItem'): ");
+	fullPrompt.append("', given the following request, create a Windows Powershell command that can solve it (your reply must only contain the command, nothing else, and do not wrap it in a markdown code block. For example: Request: 'List all items in the current directory'; Reply: 'Get-ChildItem'): ");
 	fullPrompt.append(prompt);
 
 	std::string generatedCommand = "";
@@ -246,6 +249,10 @@ std::optional<int> chat(char* model, char* host, char* apiKey) {
 
 	AiCompletionServiceFactory llm_service_factory;
 	auto llm_service = llm_service_factory.getService(model);
+	if (llm_service == NULL) {
+		std::cerr << COLOR_RED << "[ERROR] - " << model << " is currently not supported by GPTerminal. Change the defined model in the environment variable GPTERMINAL_CHAT_MODEL or GPTERMINAL_MODEL." << COLOR_RESET << std::endl;
+		return 1;
+	}
     AiCompletionService aiService = AiCompletionService(llm_service);
 
 	std::optional<std::string> ai_init_error = aiService.init(model, host, apiKey);

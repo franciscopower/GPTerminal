@@ -30,9 +30,26 @@ AiCompletionService::~AiCompletionService() {}
 
 std::shared_ptr<ChatApi> AiCompletionServiceFactory::getService(std::string model) {
 
-	
-	
-	auto gemini_service = std::make_shared<GeminiApi>();
+	std::string selected_service;
 
-	return gemini_service;
+	for (const auto& [key, value] : this->models) {
+		auto it = find(value.begin(), value.end(), model);
+		if (it != value.end()) {
+			selected_service = key;
+			exit;
+		}
+	}
+	
+	if (selected_service == "open_ai") {
+		auto openai_service = std::make_shared<OpenAiApi>();
+		return openai_service;
+	}
+	else if (selected_service == "gemini") {
+		auto gemini_service = std::make_shared<GeminiApi>();
+		return gemini_service;
+	}
+	else {
+		return NULL;
+	}
+
 }
