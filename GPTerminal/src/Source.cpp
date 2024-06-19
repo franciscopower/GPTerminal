@@ -1,8 +1,9 @@
-﻿﻿#include <iostream>
+﻿#include <iostream>
 #include <vector>
 #include <thread>
 #include <filesystem>
 #include <optional>
+#include <cstring>
 #include "clip/clip.h"
 
 #include "Result.h"
@@ -113,7 +114,6 @@ If you find any issue while using GPTerminal or would like to see some extra fea
 	
 	std::cout << COLOR_RESET;
 
-	SetConsoleOutputCP(oldcp);
 	if (returned_error.has_value())
 		return 1;
 	else

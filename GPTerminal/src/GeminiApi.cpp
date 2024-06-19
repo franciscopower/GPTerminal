@@ -17,7 +17,7 @@ std::optional<std::string> GeminiApi::init(char* model, char* host, char* apiKey
     }
 
 	if (host[0] == '\0') {
-		strcpy_s(host, 200, "https://generativelanguage.googleapis.com/v1");
+		strncpy(host, "https://generativelanguage.googleapis.com/v1", 200);
 	}
         
 

@@ -17,7 +17,7 @@ std::optional<std::string> OpenAiApi::init(char* model, char* host, char* apiKey
     }
 
 	if (host[0] == '\0') {
-		strcpy_s(host, 200, "https://api.openai.com/v1/chat/completions");
+		strncpy(host, "https://api.openai.com/v1/chat/completions", 200);
 	}
 
     // CURL initialization
@@ -31,7 +31,7 @@ std::optional<std::string> OpenAiApi::init(char* model, char* host, char* apiKey
     struct curl_slist* headers = NULL;
 
     char curlBearerHeader[BEARER_TOKEN_MAX_SIZE] = "Authorization: Bearer ";
-    strncat_s(curlBearerHeader, BEARER_TOKEN_MAX_SIZE, apiKey, BEARER_TOKEN_MAX_SIZE - 25);
+    strncat(curlBearerHeader, apiKey, BEARER_TOKEN_MAX_SIZE);
 
     headers = curl_slist_append(headers, curlBearerHeader);
     headers = curl_slist_append(headers, "Content-Type: application/json");
