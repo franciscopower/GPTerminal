@@ -4,6 +4,7 @@
 #include <vector>
 #include <thread>
 #include <filesystem>
+#include <fstream>
 
 #include <optional>
 
@@ -36,6 +37,7 @@ std::optional<int> chat(char* model, char* host, char* apiKey);
 std::optional<int> powershellHelp(std::string prompt, char* model, char* host, char* apiKey);
 void copyToClipboard(std::string textToCopy);
 void getEnvVariable(const char* envVarName, char* destination, char* error);
+Result<std::string, std::string> getHistory();
 
 int main(int argc, char** argv) {
 
@@ -106,13 +108,28 @@ If you find any issue while using GPTerminal or would like to see some extra fea
 	if ((argc == 2 && (strcmp(argv[1],"--chat") == 0 || strcmp(argv[1],"-c") == 0 )) || argc < 2) {
 		returned_error = chat(model_chat, host, apiKey);
 	} 
+	else if (argc == 2 && (strcmp(argv[1],"--fix") == 0 || strcmp(argv[1],"-f") == 0 )) {
+		//read previous command
+		Result<std::string, std::string> prevCommand_r = getHistory();
+		if (!prevCommand_r.is_ok) {
+			std::cerr << COLOR_RED << "[ERROR] - " << prevCommand_r.error << COLOR_RESET << std::endl;
+			return 1;
+		}
+		std::cout << prevCommand_r.value << std::endl;
+
+		//returned_error = powershellHelp(prompt, model, host, apiKey);
+	} 
 	else {
 		std::string prompt = "";
 		for (int i = 1; i < argc; i++) {
 			prompt.append(argv[i]);
 			prompt.append(" ");
 		}
-		returned_error = powershellHelp(prompt, model, host, apiKey);
+		std::string fullPrompt = "Keeping in mind that the current working directory is '";
+		fullPrompt.append(std::filesystem::current_path().string());
+		fullPrompt.append("', given the following request, create a Windows Powershell command that can solve it (your reply must only contain the command, nothing else, and do not wrap it in a markdown code block. For example: Request: 'List all items in the current directory'; Reply: 'Get-ChildItem'): ");
+		fullPrompt.append(prompt);
+		returned_error = powershellHelp(fullPrompt, model, host, apiKey);
 	}
 		
 	std::cout << COLOR_RESET;
@@ -157,10 +174,6 @@ std::optional<int> powershellHelp(std::string prompt, char* model, char* host, c
 	Frame outputFrame("Command");
 	Loader loader(Loader::DOTS, "Generating...");
 
-	std::string fullPrompt = "Keeping in mind that the current working directory is '";
-	fullPrompt.append(std::filesystem::current_path().string());
-	fullPrompt.append("', given the following request, create a Windows Powershell command that can solve it (your reply must only contain the command, nothing else, and do not wrap it in a markdown code block. For example: Request: 'List all items in the current directory'; Reply: 'Get-ChildItem'): ");
-	fullPrompt.append(prompt);
 
 	std::string generatedCommand = "";
 	int selectedOption = -1;
@@ -171,7 +184,7 @@ std::optional<int> powershellHelp(std::string prompt, char* model, char* host, c
 		// create completion
 		Result<std::string, std::string> completion_r;
 		std::thread completion_thread([&]() {
-			completion_r = aiService.createCompletion(fullPrompt);
+			completion_r = aiService.createCompletion(prompt);
 			});
 
 		// loader animation
@@ -216,7 +229,7 @@ std::optional<int> powershellHelp(std::string prompt, char* model, char* host, c
 			break;
 		case EXPLAIN:
 			// explain code
-			fullPrompt = "Explain the command you generated.";
+			prompt = "Explain the command you generated.";
 			outputFrame.setTitle("Explanation");
 			break;
 		case IMPROVE:
@@ -225,8 +238,8 @@ std::optional<int> powershellHelp(std::string prompt, char* model, char* host, c
 			std::cout << COLOR_YELLOW << u8"\u21aa " << COLOR_RESET;
 			char prompt_c[1000];
 			std::cin.getline(prompt_c, 1000);
-			fullPrompt = "Change the command you created according to the following (your reply must only contain the command, nothing else): ";
-			fullPrompt.append(prompt_c);
+			prompt = "Change the command you created according to the following (your reply must only contain the command, nothing else): ";
+			prompt.append(prompt_c);
 			outputFrame.setTitle("Command");
 			break;
 		case RUN:
@@ -339,3 +352,33 @@ void getEnvVariable(const char* envVarName, char* destination, char* error) {
 	return;
 
 }
+
+
+Result<std::string, std::string> getHistory() {
+	const char* history_file_name = "hist.tmp";
+
+	system("powershell \"Get-History -count 1 | ForEach-Object {echo $_.CommandLine}\"");
+	//system("powershell \"Get-History -count 1 | ForEach-Object {echo $_.CommandLine} > hist.tmp\"");
+	//std::ifstream historyFile(history_file_name);
+
+	//if (!historyFile.is_open()) {
+	//	return Result<std::string, std::string>::Err("Error opening history file.");
+	//}
+
+	//std::string lines;
+	//std::string line;
+	//while (std::getline(historyFile, line)) {
+	//	std::cout << line << std::endl;
+	//	lines.append(line);
+	//	lines.append("\n");
+	//}
+	////lines.pop_back(); //remove trailing \n
+
+	//historyFile.close();
+
+	////remove(history_file_name);
+	
+	//Return Result<std::string, std::string>::Ok(lines);
+	return Result<std::string, std::string>::Ok("test");
+}
+
