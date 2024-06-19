@@ -1,6 +1,8 @@
 #include <memory>
 #include <optional>
 #include "Result.h"
+#include "OpenAiApi.h"
+#include "GeminiApi.h"
 
 #include "AiCompletionService.h"
 
@@ -18,10 +20,19 @@ auto AiCompletionService::createCompletion(std::string user_input) -> Result<std
 	return this->chat_api->requestCompletion(user_input);
 }
 
+std::string AiCompletionService::getModel() {
+	return this->chat_api->getModel();
+}
+
 
 AiCompletionService::~AiCompletionService() {}
 
 
-//ChatApi* AiCompletionServiceFactory::getService(std::string model) {
-//	
-//}
+std::shared_ptr<ChatApi> AiCompletionServiceFactory::getService(std::string model) {
+
+	
+	
+	auto gemini_service = std::make_shared<GeminiApi>();
+
+	return gemini_service;
+}

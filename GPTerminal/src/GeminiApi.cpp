@@ -9,7 +9,17 @@
 GeminiApi::GeminiApi() {}
 
 std::optional<std::string> GeminiApi::init(char* model, char* host, char* apiKey) {
-    this->model = model;
+	if (model[0] == '\0') {
+        this->model = "gemini-1.5-flash";
+	}
+    else {
+        this->model = model;
+    }
+
+	if (host[0] == '\0') {
+		strcpy_s(host, 200, "https://generativelanguage.googleapis.com/v1");
+	}
+        
 
     // CURL initialization
     curl_global_init(CURL_GLOBAL_ALL);
@@ -22,7 +32,7 @@ std::optional<std::string> GeminiApi::init(char* model, char* host, char* apiKey
     std::string complete_url;
     complete_url.append(host);
     complete_url.append("/models/");
-    complete_url.append(model);
+    complete_url.append(this->model);
     complete_url.append(":generateContent?key=");
     complete_url.append(apiKey);
 

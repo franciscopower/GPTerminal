@@ -10,7 +10,11 @@ public:
 	~OpenAiApi();
 
 	std::optional<std::string> init(char* model, char* host, char* apiKey) override;
-	virtual Result<std::string, std::string> requestCompletion(std::string user_input) override;
+	Result<std::string, std::string> requestCompletion(std::string user_input) override;
+
+	std::string getModel() override {
+		return this->model;
+	}
 
 private:
 

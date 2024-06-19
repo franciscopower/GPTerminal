@@ -9,7 +9,16 @@
 OpenAiApi::OpenAiApi() {}
 
 std::optional<std::string> OpenAiApi::init(char* model, char* host, char* apiKey) {
-    this->model = model;
+	if (model[0] == '\0') {
+        this->model = "gpt-3.5-turbo";
+	}
+    else {
+        this->model = model;
+    }
+
+	if (host[0] == '\0') {
+		strcpy_s(host, 200, "https://api.openai.com/v1/chat/completions");
+	}
 
     // CURL initialization
     curl_global_init(CURL_GLOBAL_ALL);

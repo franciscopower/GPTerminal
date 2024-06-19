@@ -43,6 +43,7 @@ int main(int argc, char** argv) {
 
 	//get settings
 	char model[ENV_VAR_MAX_SIZE] = "";
+	char model_chat[ENV_VAR_MAX_SIZE] = "";
 	char host[ENV_VAR_MAX_SIZE] = "";
 	char apiKey[ENV_VAR_MAX_SIZE] = "";
 
@@ -50,6 +51,7 @@ int main(int argc, char** argv) {
 	const char ENV_OPENAI_API_KEY[] = "OPENAI_API_KEY";
 	const char ENV_LLM_API_HOST[] = "GPTERMINAL_LLM_API_HOST";
 	const char ENV_LLM_MODEL[] = "GPTERMINAL_MODEL";
+	const char ENV_LLM_MODEL_CHAT[] = "GPTERMINAL_CHAT_MODEL";
 
 	char err_llmKey[ERROR_MESSAGE_MAX_SIZE];
 	char err_openaiKey[ERROR_MESSAGE_MAX_SIZE];
@@ -63,14 +65,11 @@ int main(int argc, char** argv) {
 	char error[ERROR_MESSAGE_MAX_SIZE];
 	getEnvVariable(ENV_LLM_API_HOST, host, error);
 	getEnvVariable(ENV_LLM_MODEL, model, error);
-	if (host[0] == '\0') {
-		//strcpy_s(host, ENV_VAR_MAX_SIZE, "https://api.openai.com/v1/chat/completions");
-		strcpy_s(host, ENV_VAR_MAX_SIZE, "https://generativelanguage.googleapis.com/v1");
+	getEnvVariable(ENV_LLM_MODEL, model_chat, error);
+	if (model_chat[0] == '\0') {
+		strncpy(model_chat, model, ENV_VAR_MAX_SIZE);
 	}
-	if (model[0] == '\0') {
-		//strcpy_s(model, ENV_VAR_MAX_SIZE, "gpt-3.5-turbo");
-		strcpy_s(model, ENV_VAR_MAX_SIZE, "gemini-1.5-flash");
-	}
+	
 
 	// Set console code page to UTF-8 so console known how to interpret string data
 	UINT oldcp = GetConsoleOutputCP();  //what is the current code page? store for later
@@ -93,9 +92,10 @@ USAGE: GPTerminal [-h | --help] [-c | --chat] <command description>
 	- [-h | --help] - Show this help message
 
 CONFIGURATIONS: Set the following environment variables
-	- GPTERMINAL_LLM_API_KEY - Your OpenAI API key
+	- GPTERMINAL_LLM_API_KEY - Your API key (for OpenAI API or for the Google Gemini API)
 	- GPTERMINAL_LLM_API_HOST - (optional) The host address (url) you want to use. Defaults to the OpenAI host address.
-	- GPTERMINAL_MODEL - (optional) The OpenAI model you want to use. Defaults to gpt-3.5-turbo.
+	- GPTERMINAL_MODEL - (optional) The LLM model you want to use. Defaults to gpt-3.5-turbo.
+	- GPTERMINAL_CHAT_MODEL - (optional) The LLM model you want to use in chat mode. Defaults to the same model you choose in the GPTERMINAL_MODEL environment variable.
 
 If you find any issue while using GPTerminal or would like to see some extra feature, feel free to reach out here: 
 - https://github.com/franciscopower/GPTerminal/issues
@@ -107,7 +107,7 @@ If you find any issue while using GPTerminal or would like to see some extra fea
 	}
 
 	if ((argc == 2 && (strcmp(argv[1],"--chat") == 0 || strcmp(argv[1],"-c") == 0 )) || argc < 2) {
-		returned_error = chat(model, host, apiKey);
+		returned_error = chat(model_chat, host, apiKey);
 	} 
 	else {
 		std::string prompt = "";
@@ -158,7 +158,7 @@ std::optional<int> powershellHelp(std::string prompt, char* model, char* host, c
 
 	std::string fullPrompt = "Keeping in mind that the current working directory is '";
 	fullPrompt.append(std::filesystem::current_path().string());
-	fullPrompt.append("', given the following request, create a Windows Powershell command that can solve it (your reply must only contain the command, nothing else): ");
+	fullPrompt.append("', given the following request, create a Windows Powershell command that can solve it (your reply must only contain the command, nothing else. For example: Request: 'List all items in the current directory'; Reply: 'Get-ChildItem'): ");
 	fullPrompt.append(prompt);
 
 	std::string generatedCommand = "";
@@ -244,13 +244,14 @@ std::optional<int> chat(char* model, char* host, char* apiKey) {
 
 	Loader loader(Loader::DOTS, "Generating...");
 
-	//auto openai_service = std::make_shared<OpenAiApi>();
-	auto gemini_service = std::make_shared<GeminiApi>();
-    AiCompletionService aiService = AiCompletionService(gemini_service);
-
-	std::cout << "Hi! I'm " << model << ". Let's chat! And when you want to quit, just type 'quit' or 'q' :)" << std::endl;
+	AiCompletionServiceFactory llm_service_factory;
+	auto llm_service = llm_service_factory.getService(model);
+    AiCompletionService aiService = AiCompletionService(llm_service);
 
 	std::optional<std::string> ai_init_error = aiService.init(model, host, apiKey);
+
+	std::cout << "Hi! I'm " << aiService.getModel() << ". Let's chat! And when you want to quit, just type 'quit' or 'q' :)" << std::endl;
+
 	if (ai_init_error.has_value()) {
 		std::cerr << COLOR_RED << "[ERROR] - " << ai_init_error.value() << COLOR_RESET << std::endl;
 		return 1;

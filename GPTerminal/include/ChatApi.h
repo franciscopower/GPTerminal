@@ -26,6 +26,8 @@ public:
       "gemini-1.0-pro",
 	};
 
+	virtual std::string getModel() = 0; 
+
 protected:
 
 	struct ChatEntry {
