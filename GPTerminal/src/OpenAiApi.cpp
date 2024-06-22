@@ -142,7 +142,7 @@ auto OpenAiApi::parseReply(std::string api_reply) -> Result<std::string, std::st
         reply = std::string(nlohmann::json::parse(api_reply)["choices"][0]["message"]["content"]); 
         role = std::string(nlohmann::json::parse(api_reply)["choices"][0]["message"]["role"]); 
     }
-    catch (const std::exception& e)
+    catch (const std::exception&)
     {
         try
         {
