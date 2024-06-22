@@ -32,8 +32,13 @@
 #define ENV_VAR_MAX_SIZE 200
 #define ERROR_MESSAGE_MAX_SIZE 100
 
+const enum Functions {
+	GENERATE,
+	IMPROVE
+};
+
 std::optional<int> chat(char* model, char* host, char* apiKey);
-std::optional<int> powershellHelp(std::string prompt, char* model, char* host, char* apiKey);
+std::optional<int> powershellHelp(std::string prompt, char* model, char* host, char* apiKey, Functions function);
 void copyToClipboard(std::string textToCopy);
 void getEnvVariable(const char* envVarName, char* destination, char* error);
 
@@ -106,13 +111,25 @@ If you find any issue while using GPTerminal or would like to see some extra fea
 	if ((argc == 2 && (strcmp(argv[1],"--chat") == 0 || strcmp(argv[1],"-c") == 0 )) || argc < 2) {
 		returned_error = chat(model_chat, host, apiKey);
 	} 
+	else if (argc > 2 && (strcmp(argv[1],"--improve") == 0 || strcmp(argv[1],"-i") == 0 )) {
+		std::string prompt = "";
+		for (int i = 2; i < argc; i++) {
+			prompt.append(argv[i]);
+			prompt.append(" ");
+		}
+		returned_error = powershellHelp(prompt, model, host, apiKey, Functions::IMPROVE);
+	} 
 	else {
 		std::string prompt = "";
 		for (int i = 1; i < argc; i++) {
 			prompt.append(argv[i]);
 			prompt.append(" ");
 		}
-		returned_error = powershellHelp(prompt, model, host, apiKey);
+		std::string fullPrompt = "Keeping in mind that the current working directory is '";
+		fullPrompt.append(std::filesystem::current_path().string());
+		fullPrompt.append("', given the following request, create a Windows Powershell command that can solve it (your reply must only contain the command, nothing else, and do not wrap it in a markdown code block. For example: Request: 'List all items in the current directory'; Reply: 'Get-ChildItem'): ");
+		fullPrompt.append(prompt);
+		returned_error = powershellHelp(fullPrompt, model, host, apiKey, Functions::GENERATE);
 	}
 	
 	std::cout << COLOR_RESET;
@@ -124,7 +141,7 @@ If you find any issue while using GPTerminal or would like to see some extra fea
 		return 0;
 }
  
-std::optional<int> powershellHelp(std::string prompt, char* model, char* host, char* apiKey) {
+std::optional<int> powershellHelp(std::string prompt, char* model, char* host, char* apiKey, Functions function) {
 
 	AiCompletionServiceFactory llm_service_factory;
 	auto llm_service = llm_service_factory.getService(model);
@@ -144,7 +161,8 @@ std::optional<int> powershellHelp(std::string prompt, char* model, char* host, c
 		EXPLAIN,
 		IMPROVE,
 		//RUN,
-		QUIT
+		QUIT,
+		IMPROVE_EXISTING
 	};
 	std::vector<std::string> options = {
 		"Copy to Clipboard",
@@ -157,21 +175,75 @@ std::optional<int> powershellHelp(std::string prompt, char* model, char* host, c
 	Frame outputFrame("Command");
 	Loader loader(Loader::DOTS, "Generating...");
 
-	std::string fullPrompt = "Keeping in mind that the current working directory is '";
-	fullPrompt.append(std::filesystem::current_path().string());
-	fullPrompt.append("', given the following request, create a Windows Powershell command that can solve it (your reply must only contain the command, nothing else, and do not wrap it in a markdown code block. For example: Request: 'List all items in the current directory'; Reply: 'Get-ChildItem'): ");
-	fullPrompt.append(prompt);
 
 	std::string generatedCommand = "";
+	std::string fullPrompt;
+	char prompt_c[1000];
+
 	int selectedOption = -1;
+	if (function == Functions::IMPROVE) {
+		selectedOption = options_enum::IMPROVE;
+		generatedCommand = prompt;
+	}
+
 
 	// main loop
 	while (!responseComplete) {
 
+		switch (selectedOption)
+		{
+		case options_enum::COPY:
+			// copy to clipboard
+			copyToClipboard(generatedCommand);
+			responseComplete = true;
+			break;
+		case options_enum::EXPLAIN:
+			// explain code
+			prompt = "Explain the command you generated.";
+			outputFrame.setTitle("Explanation");
+			break;
+		case options_enum::IMPROVE:
+			// improve
+			std::cout << "How should I improve the command?" << std::endl;
+			std::cout << COLOR_YELLOW << u8"\u21aa " << COLOR_RESET;
+			std::cin.getline(prompt_c, 1000);
+			prompt = "Change the command you created according to the following (your reply must only contain the command, nothing else): ";
+			prompt.append(prompt_c);
+			outputFrame.setTitle("Command");
+			break;
+		//case RUN:
+		//	// run code
+		//	system(completion.c_str());
+		//	responseComplete = true;
+		//	break;
+		case options_enum::QUIT:
+			responseComplete = true;
+			break;
+		case options_enum::IMPROVE_EXISTING:
+			// improve
+			std::cout << "How should I improve the command?" << std::endl;
+			std::cout << COLOR_YELLOW << u8"\u21aa " << COLOR_RESET;
+			std::cin.getline(prompt_c, 1000);
+			fullPrompt = "My current working directory is '";
+			fullPrompt.append(std::filesystem::current_path().string());
+			fullPrompt.append("'. I wrote the following Windows Powershell command: \n");
+			fullPrompt.append(generatedCommand);
+			fullPrompt.append("\nYou are an expert in Windows Powershell. Modify or fix the command I created accordding to the following (your reply must only contain the command, nothing else, and do not wrap it in a markdown code block.) : ");
+			prompt.append(prompt_c);
+			outputFrame.setTitle("Command");
+			break;
+		default:
+			responseComplete = false;
+			break;
+		}
+
+		if (responseComplete)
+			break;
+
 		// create completion
 		Result<std::string, std::string> completion_r;
 		std::thread completion_thread([&]() {
-			completion_r = aiService.createCompletion(fullPrompt);
+			completion_r = aiService.createCompletion(prompt);
 			});
 
 		// loader animation
@@ -185,7 +257,7 @@ std::optional<int> powershellHelp(std::string prompt, char* model, char* host, c
 
 		// display result
 		if (completion_r.is_ok) {
-			if (selectedOption == -1 || selectedOption == IMPROVE) { generatedCommand = completion_r.value; }
+			if (selectedOption == -1 || selectedOption == options_enum::IMPROVE || selectedOption == options_enum::IMPROVE_EXISTING) { generatedCommand = completion_r.value; }
 			outputFrame.setContent(completion_r.value);
 			std::cout << outputFrame.draw() << std::endl << std::endl;
 		}
@@ -202,40 +274,6 @@ std::optional<int> powershellHelp(std::string prompt, char* model, char* host, c
 		}
 		std::cout << std::endl << std::endl;
 
-		switch (selectedOption)
-		{
-		case COPY:
-			// copy to clipboard
-			copyToClipboard(generatedCommand);
-			responseComplete = true;
-			break;
-		case EXPLAIN:
-			// explain code
-			fullPrompt = "Explain the command you generated.";
-			outputFrame.setTitle("Explanation");
-			break;
-		case IMPROVE:
-			// improve
-			std::cout << "How should I improve the command?" << std::endl;
-			std::cout << COLOR_YELLOW << u8"\u21aa " << COLOR_RESET;
-			char prompt_c[1000];
-			std::cin.getline(prompt_c, 1000);
-			fullPrompt = "Change the command you created according to the following (your reply must only contain the command, nothing else): ";
-			fullPrompt.append(prompt_c);
-			outputFrame.setTitle("Command");
-			break;
-		//case RUN:
-		//	// run code
-		//	system(completion.c_str());
-		//	responseComplete = true;
-		//	break;
-		case QUIT:
-			responseComplete = true;
-			break;
-		default:
-			responseComplete = true;
-			break;
-		}
 	}
 	return {};
 }
