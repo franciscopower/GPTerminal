@@ -144,12 +144,28 @@ auto OpenAiApi::parseReply(std::string api_reply) -> Result<std::string, std::st
     }
     catch (const std::exception& e)
     {
-        try {
-            reply = std::string(nlohmann::json::parse(api_reply)["error"]["message"]); 
-            return Result<std::string, std::string>::Err(reply);
+        try
+        {
+            reply = std::string(nlohmann::json::parse(api_reply)["choices"][0]["finish_reason"]);
+            if (reply == "content_filter") {
+			    return Result<std::string, std::string>::Err("Sorry. For safety reasons, I cannot provide you with an answer.");
+            }
+            else if (reply == "length") {
+			    return Result<std::string, std::string>::Err("Sorry, I cannot complete your request as I've reached the maximum nr of tokens for this request.");
+            }
+            else {
+			    return Result<std::string, std::string>::Err("Sorry. For reasons not even I understand, I could not complete your request.");
+            }
         }
-        catch (const std::exception& e) {
-            return Result<std::string, std::string>::Err(e.what());
+        catch (const std::exception&)
+        {
+			try {
+				reply = std::string(nlohmann::json::parse(api_reply)["error"]["message"]); 
+				return Result<std::string, std::string>::Err(reply);
+			}
+			catch (const std::exception& e) {
+				return Result<std::string, std::string>::Err(e.what() + '\n\n' + api_reply);
+			}
         }
     }
 
