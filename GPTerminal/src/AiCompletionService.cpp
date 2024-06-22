@@ -36,7 +36,7 @@ std::shared_ptr<ChatApi> AiCompletionServiceFactory::getService(std::string mode
 		auto it = find(value.begin(), value.end(), model);
 		if (it != value.end()) {
 			selected_service = key;
-			exit;
+			break;
 		}
 	}
 	

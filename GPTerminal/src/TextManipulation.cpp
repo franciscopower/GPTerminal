@@ -52,7 +52,7 @@ namespace ManipulateText {
 		std::string output = "";
 		// get window size
 		CONSOLE_SCREEN_BUFFER_INFO csbi;
-		int winColumns, winRows;
+		int winColumns;
 
 		GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
 		winColumns = csbi.srWindow.Right - csbi.srWindow.Left + 1;

@@ -146,7 +146,7 @@ auto GeminiApi::parseReply(std::string api_reply) -> Result<std::string, std::st
         reply.pop_back(); // remove last char, which is a "\n"
         role = std::string(nlohmann::json::parse(api_reply)["candidates"][0]["content"]["role"]); 
     }
-    catch (const std::exception& e)
+    catch (const std::exception&)
     {
         try
         {
@@ -171,7 +171,7 @@ auto GeminiApi::parseReply(std::string api_reply) -> Result<std::string, std::st
 				return Result<std::string, std::string>::Err(reply);
 			}
 			catch (const std::exception& e) {
-				return Result<std::string, std::string>::Err(e.what() + '\n\n' + api_reply);
+				return Result<std::string, std::string>::Err(e.what() + std::string("\n\n") + api_reply);
 			}
         }
     }
