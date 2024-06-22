@@ -1,6 +1,5 @@
 #include <memory>
 #include <optional>
-#include "Result.h"
 #include "OpenAiApi.h"
 #include "GeminiApi.h"
 #include <algorithm>

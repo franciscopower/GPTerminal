@@ -148,12 +148,31 @@ auto GeminiApi::parseReply(std::string api_reply) -> Result<std::string, std::st
     }
     catch (const std::exception& e)
     {
-        try {
-            reply = std::string(nlohmann::json::parse(api_reply)["error"]["message"]); 
-            return Result<std::string, std::string>::Err(reply);
+        try
+        {
+            reply = std::string(nlohmann::json::parse(api_reply)["candidates"][0]["finishReason"]);
+            if (reply == "SAFETY") {
+			    return Result<std::string, std::string>::Err("Sorry. For safety reasons, I cannot provide you with an answer.");
+            }
+            else if (reply == "MAX_TOKENS") {
+			    return Result<std::string, std::string>::Err("Sorry, I cannot complete your request as I've reached the maximum nr of tokens for this request.");
+            }
+            else if (reply == "RECITATION") {
+			    return Result<std::string, std::string>::Err("Sorry. The content I generated was flagged for recitation reasons.");
+            }
+            else {
+			    return Result<std::string, std::string>::Err("Sorry. For reasons not even I understand, I could not complete your request.");
+            }
         }
-        catch (const std::exception& e) {
-            return Result<std::string, std::string>::Err(e.what());
+        catch (const std::exception&)
+        {
+			try {
+				reply = std::string(nlohmann::json::parse(api_reply)["error"]["message"]); 
+				return Result<std::string, std::string>::Err(reply);
+			}
+			catch (const std::exception& e) {
+				return Result<std::string, std::string>::Err(e.what() + '\n\n' + api_reply);
+			}
         }
     }
 

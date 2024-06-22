@@ -12,8 +12,6 @@
 #include "Loader.h"
 #include "HLine.h"
 #include "AiCompletionService.h"
-#include "OpenAiApi.h"
-#include "GeminiApi.h"
 #include "TextManipulation.h"
 #include "Frame.h"
 
