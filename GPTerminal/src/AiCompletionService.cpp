@@ -2,12 +2,9 @@
 #include <optional>
 #include "OpenAiApi.h"
 #include "GeminiApi.h"
-<<<<<<< HEAD
 #include <algorithm>
-=======
 #include "ClaudeApi.h"
 #include "Result.h"
->>>>>>> origin/feature/claude-api
 
 #include "AiCompletionService.h"
 
