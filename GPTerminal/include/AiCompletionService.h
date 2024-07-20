@@ -26,6 +26,7 @@ public:
 
 	const std::unordered_map<std::string, std::vector<std::string>> models = {
 		{"open_ai", {
+			  "gpt-4o-mini",
 			  "gpt-4o",
 			  "gpt-4",
 			  "gpt-4-turbo",
@@ -36,6 +37,13 @@ public:
 			  "gemini-1.5-pro",
 			  "gemini-1.5-flash",
 			  "gemini-1.0-pro",
+			}
+		},
+		{"claude", {
+			  "claude-3-5-sonnet-20240620",
+			  "claude-3-opus-20240229",
+			  "claude-3-sonnet-20240229",
+			  "claude-3-haiku-20240307",
 			}
 		}
 	};
