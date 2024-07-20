@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\ClaudeApi.cpp" />
     <ClCompile Include="src\Frame.cpp" />
     <ClCompile Include="src\AiCompletionService.cpp" />
     <ClCompile Include="src\GeminiApi.cpp" />
@@ -30,6 +31,7 @@
   <ItemGroup>
     <ClInclude Include="dependencies\json.hpp" />
     <ClInclude Include="include\ChatApi.h" />
+    <ClInclude Include="include\ClaudeApi.h" />
     <ClInclude Include="include\GeminiApi.h" />
     <ClInclude Include="include\TextManipulation.h" />
     <ClInclude Include="include\Frame.h" />

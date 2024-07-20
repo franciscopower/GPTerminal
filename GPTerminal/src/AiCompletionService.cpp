@@ -2,6 +2,7 @@
 #include <optional>
 #include "OpenAiApi.h"
 #include "GeminiApi.h"
+#include "ClaudeApi.h"
 #include "Result.h"
 
 #include "AiCompletionService.h"
@@ -40,13 +41,17 @@ std::shared_ptr<ChatApi> AiCompletionServiceFactory::getService(std::string mode
 		}
 	}
 	
-	if (selected_service == "open_ai" || model == "") {
+	if (selected_service == "open_ai" || model == "") { // default model provider
 		auto openai_service = std::make_shared<OpenAiApi>();
 		return openai_service;
 	}
 	else if (selected_service == "gemini") {
 		auto gemini_service = std::make_shared<GeminiApi>();
 		return gemini_service;
+	}
+	else if (selected_service == "claude") {
+		auto claude_service = std::make_shared<ClaudeApi>();
+		return claude_service;
 	}
 	else {
 		return NULL;
