@@ -111,12 +111,18 @@ If you find any issue while using GPTerminal or would like to see some extra fea
 	if ((argc == 2 && (strcmp(argv[1],"--chat") == 0 || strcmp(argv[1],"-c") == 0 )) || argc < 2) {
 		returned_error = chat(model_chat, host, apiKey);
 	} 
-	else if (argc > 2 && (strcmp(argv[1],"--improve") == 0 || strcmp(argv[1],"-i") == 0 )) {
+	else if (argc >= 2 && (strcmp(argv[1],"--improve") == 0 || strcmp(argv[1],"-i") == 0 )) {
 		std::string prompt = "";
-		for (int i = 2; i < argc; i++) {
-			prompt.append(argv[i]);
-			prompt.append(" ");
+		if (argc == 2) {
+			std::getline(std::cin, prompt);
+		} 
+		else {
+			for (int i = 2; i < argc; i++) {
+				prompt.append(argv[i]);
+				prompt.append(" ");
+			}
 		}
+
 		returned_error = powershellHelp(prompt, model, host, apiKey, Functions::IMPROVE);
 	} 
 	else {
@@ -178,11 +184,11 @@ std::optional<int> powershellHelp(std::string prompt, char* model, char* host, c
 
 	std::string generatedCommand = "";
 	std::string fullPrompt;
-	char prompt_c[1000];
+	std::string user_input;
 
 	int selectedOption = -1;
 	if (function == Functions::IMPROVE) {
-		selectedOption = options_enum::IMPROVE;
+		selectedOption = options_enum::IMPROVE_EXISTING;
 		generatedCommand = prompt;
 	}
 
@@ -206,9 +212,9 @@ std::optional<int> powershellHelp(std::string prompt, char* model, char* host, c
 			// improve
 			std::cout << "How should I improve the command?" << std::endl;
 			std::cout << COLOR_YELLOW << u8"\u21aa " << COLOR_RESET;
-			std::cin.getline(prompt_c, 1000);
+			std::getline(std::cin, user_input);
 			prompt = "Change the command you created according to the following (your reply must only contain the command, nothing else): ";
-			prompt.append(prompt_c);
+			prompt.append(user_input);
 			outputFrame.setTitle("Command");
 			break;
 		//case RUN:
@@ -223,13 +229,13 @@ std::optional<int> powershellHelp(std::string prompt, char* model, char* host, c
 			// improve
 			std::cout << "How should I improve the command?" << std::endl;
 			std::cout << COLOR_YELLOW << u8"\u21aa " << COLOR_RESET;
-			std::cin.getline(prompt_c, 1000);
-			fullPrompt = "My current working directory is '";
-			fullPrompt.append(std::filesystem::current_path().string());
-			fullPrompt.append("'. I wrote the following Windows Powershell command: \n");
-			fullPrompt.append(generatedCommand);
-			fullPrompt.append("\nYou are an expert in Windows Powershell. Modify or fix the command I created accordding to the following (your reply must only contain the command, nothing else, and do not wrap it in a markdown code block.) : ");
-			prompt.append(prompt_c);
+			std::getline(std::cin, user_input);
+			prompt = "My current working directory is '";
+			prompt.append(std::filesystem::current_path().string());
+			prompt.append("'. I wrote the following Windows Powershell command: \n");
+			prompt.append(generatedCommand);
+			prompt.append("\nYou are an expert in Windows Powershell. Modify or fix the command I created accordding to the following (your reply must only contain the command, nothing else, and do not wrap it in a markdown code block. For example: Request: 'List all items in the current directory'; Reply: 'Get-ChildItem') : ");
+			prompt.append(user_input);
 			outputFrame.setTitle("Command");
 			break;
 		default:
@@ -303,9 +309,9 @@ std::optional<int> chat(char* model, char* host, char* apiKey) {
 	while (true) {
 
 		std::cout << COLOR_DARKGRAY << "You: " << COLOR_RESET;
-		char prompt_c[1000];
-		std::cin.getline(prompt_c, 1000);
-		std::string prompt = prompt_c;
+		std::string user_input;
+		std::getline(std::cin, user_input);
+		std::string prompt = user_input;
 
 		if (prompt == "q" || prompt == "quit")
 			break;
