@@ -380,3 +380,4 @@ FodyWeavers.xsd
 *.msp
 
 build/
+vcpkg_installed/
